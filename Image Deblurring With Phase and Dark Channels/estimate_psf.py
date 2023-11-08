@@ -1,0 +1,64 @@
+import torch
+import torch.fft as fft
+import torch.nn.functional as F
+from scipy.signal import convolve2d
+from scipy.sparse.linalg import cg
+
+def estimate_psf(blurred_x, blurred_y, latent_x, latent_y, weight, psf_size):
+    latent_xf = fft.fft2(latent_x)
+    latent_yf = fft.fft2(latent_y)
+    blurred_xf = fft.fft2(blurred_x)
+    blurred_yf = fft.fft2(blurred_y)
+
+    b_f = torch.conj(latent_xf) * blurred_xf + torch.conj(latent_yf) * blurred_yf
+    b = fft.ifft2(b_f).real
+
+    p_m = torch.conj(latent_xf) * latent_xf + torch.conj(latent_yf) * latent_yf
+    p_img_size = torch.tensor(latent_xf.shape)
+    p_psf_size = torch.tensor(psf_size)
+    p_lambda = weight
+
+    psf = torch.ones(psf_size) / torch.prod(torch.tensor(psf_size), dtype=torch.float32)
+    psf = conjgrad(psf, b, 20, 1e-5, compute_Ax, (p_m, p_img_size, p_psf_size, p_lambda))
+    
+    psf[psf < torch.max(psf) * 0.05] = 0
+    psf /= torch.sum(psf)
+    
+    return psf
+
+def compute_Ax(x, p):
+    x_f = fft.ifftshift(x)
+    x_f = fft.fftn(x_f, s=p[1])
+    y = fft.ifft2(p[0] * x_f).real
+    y += p[3] * x
+    y = fft.fftshift(y)
+    return y
+
+def conjgrad(x, b, niter, tol, A, A_args=()):
+    x = x.clone()
+    b = b.clone()
+    r = b - A(x, A_args)
+    p = r.clone()
+    rsold = torch.sum(r * r)
+    for i in range(niter):
+        Ap = A(p, A_args)
+        alpha = rsold / torch.sum(p * Ap)
+        x += alpha * p
+        r -= alpha * Ap
+        rsnew = torch.sum(r * r)
+        if torch.sqrt(rsnew) < tol:
+            break
+        p = r + (rsnew / rsold) * p
+        rsold = rsnew
+    return x
+
+# Example usage
+# blurred_x = torch.randn(128, 128)
+# blurred_y = torch.randn(128, 128)
+# latent_x = torch.randn(128, 128)
+# latent_y = torch.randn(128, 128)
+# weight = 0.01
+# psf_size = (64, 64)
+
+# psf = estimate_psf(blurred_x, blurred_y, latent_x, latent_y, weight, psf_size)
+# print(psf)
