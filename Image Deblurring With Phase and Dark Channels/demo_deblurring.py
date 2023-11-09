@@ -47,7 +47,7 @@ def main():
         yg = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY) / 255.0
         yg = torch.from_numpy(yg).type(torch.float32)
     # Perform blind deconvolution
-
+    print(f'YG Shape {yg.shape} in demo deblurring')
     kernel, interim_latent = blind_deconv(yg, lambda_dark, lambda_grad, opts)
 
     # Perform non-blind deconvolution

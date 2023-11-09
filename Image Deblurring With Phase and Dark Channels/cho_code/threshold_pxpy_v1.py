@@ -13,7 +13,7 @@ def threshold_pxpy_v1(latent, psf_size, threshold=None):
 
     # Denoised is the same as latent in this version
     denoised = latent.clone()
-
+    print(f'denoised shape {denoised.shape}')
     # Define derivative filters
     dx = torch.tensor([[-1, 1], [0, 0]], dtype=torch.float)
     dy = torch.tensor([[-1, 0], [1, 0]], dtype=torch.float)

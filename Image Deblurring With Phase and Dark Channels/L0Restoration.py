@@ -1,7 +1,7 @@
 import torch
 from cho_code.wrap_boundary_liu import wrap_boundary_liu
 from cho_code.opt_fft_size import opt_fft_size
-from misc import psf2otf, fft, fft2
+from misc import psf2otf, fft, fft2, ifft, ifft2
 def L0Restoration(Im, kernel, lambda_, kappa=2.0):
     if not kappa:
         kappa = 2.0
@@ -15,7 +15,7 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
     
     # Initialize S
     S = Im.clone()
-    print(S.shape)
+    # print(S.shape)
     betamax = 1e5
     fx = torch.tensor([[1, -1]], dtype=torch.float32)
     fy = fx.t()
@@ -37,8 +37,8 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
         Denormin2 = Denormin2.unsqueeze(dim=2).expand(-1, -1, D)
         KER = KER.unsqueeze(dim=2).expand(-1, -1, D)
         Den_KER = Den_KER.unsqueeze(dim=2).expand(-1, -1, D)
-    #print(f'Kernel dims {KER.shape}, S shape {S.shape}')
-    Normin1 = torch.conj(KER) * fft2(S)
+    print(f'Kernel dims {KER.shape}, S shape {S.shape}')
+    Normin1 = torch.conj(KER).unsqueeze(-1).expand_as(S) * fft2(S)
     
     beta = 2 * lambda_
     while beta < betamax:
@@ -76,8 +76,9 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
         v2 = -torch.diff(v,dim=0)
         v1 = v1.unsqueeze(0)
         Normin2 += torch.cat((v1,v2))
-        FS = (Normin1 + beta * fft2(Normin2)) / Denormin
-        S = fft.ifftn(FS).real
+        
+        FS = (Normin1 + beta * fft2(Normin2)) / Denormin.unsqueeze(-1).expand_as(Normin1)
+        S = ifft2(FS).real
        
         beta *= kappa
         

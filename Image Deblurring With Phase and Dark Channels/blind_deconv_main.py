@@ -42,7 +42,9 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
             S = L0Deblur_dark_channel(blur_B_w, k, lambda_dark, lambda_grad, 2.0)
             S = S[0:H, 0:W, :]
         else:
+            print(f'before L0 restoration S shape {blur_B.shape}')
             S = L0Restoration(blur_B, k, lambda_grad, 2.0)
+            print(f'After L0 restoration S shape {S.shape}')
         
         latent_x, latent_y, threshold = threshold_pxpy_v1(S, max(k.size()), threshold)
         

@@ -266,4 +266,7 @@ print(z)
 
 
 # print(threshold)
-
+a = torch.ones((5,5,1))
+b = torch.ones((5,5))
+c = a*b
+print(c)

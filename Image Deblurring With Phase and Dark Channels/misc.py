@@ -40,23 +40,45 @@ def conv2(A, B, shape):
     #then if it is valid, return just the center crop version of it
     #Expect A and B to be 2 dimensional matrieces
     #if shape is full then return full
-    padCol = int((B.shape[1]*2 - 2)/2)
-    padRow = int((B.shape[0]*2 - 2)/2)
-    cropX, cropY = (A.shape[0]-B.shape[0]+1, A.shape[1]-B.shape[1]+1)
-    
-    padding = (padCol, padCol, padRow, padRow)
-    A = F.pad(A,padding, value=0)
-    
-    B = torch.flip(B,[0,1])
-    res = F.conv2d(A.unsqueeze(0).unsqueeze(0),B.unsqueeze(0).unsqueeze(0))
-    res = res.squeeze() 
-    if shape=='full':
-        return res
+    if A.dim() == 2:
+        print(f'and finally A = {A.shape} B = {B.shape}')
+        padCol = int((B.shape[1]*2 - 2)/2)
+        padRow = int((B.shape[0]*2 - 2)/2)
+        cropX, cropY = (A.shape[0]-B.shape[0]+1, A.shape[1]-B.shape[1]+1)
+        
+        padding = (padCol, padCol, padRow, padRow)
+        A = F.pad(A,padding, value=0)
+        
+        B = torch.flip(B,[0,1])
+        print(f'Before disaster : A = {A.shape} B = {B.shape}')
+        res = F.conv2d(A.unsqueeze(0).unsqueeze(0),B.unsqueeze(0).unsqueeze(0))
+        res = res.squeeze() 
+        if shape=='full':
+            return res
+        else:
+            M,N = res.shape
+            row = (M - cropX)//2
+            col = (N - cropY)//2
+            return res[row:row+cropX, col:col+cropY] 
     else:
-        M,N = res.shape
-        row = (M - cropX)//2
-        col = (N - cropY)//2
-        return res[row:row+cropX, col:col+cropY] 
+        padCol = int((B.shape[1]*2 - 2)/2)
+        padRow = int((B.shape[0]*2 - 2)/2)
+        padding = (padCol, padCol, padRow, padRow)
+        cropX, cropY = (A[:,:,0].shape[0]-B.shape[0]+1, A[:,:,0].shape[1]-B.shape[1]+1)
+        B = torch.flip(B,[0,1])
+        res = torch.zeros((int(A.shape[0] + B.shape[0]- 1), int(A.shape[1] + B.shape[1] - 1), A.shape[2]))
+        for i in range(A.shape[2]):
+            temp = F.pad(A[:,:,i], padding, value=0)
+            res[:,:,i] = F.conv2d(temp.unsqueeze(0).unsqueeze(0),B.unsqueeze(0).unsqueeze(0))
+            res[:,:,i] = res[:,:,i].squeeze(0).squeeze(0)
+        if shape=='full':
+            return res
+        else:
+            M,N,_ =res.shape
+            row = (M - cropX)//2
+            col = (N - cropY)//2
+            return res[row:row+cropX, col:col+cropY,:]
+            
 
 def conv2Vector(u,v, A, shape):
     #pretty similar 
@@ -95,20 +117,45 @@ def fft(input):
     return result
 
 def fft2(input):
-    input = input.t()
-    input = torch.fft.fft(input).t()
-    result = torch.fft.fft(input)
+    if input.dim() == 2:
+        # If input is already 2D, simply apply FFT
+        input = input.t()
+        input = torch.fft.fft(input).t()
+        result = torch.fft.fft(input)
+    elif input.dim() == 3:
+        # If input is 3D, apply FFT along the last dimension for each 2D matrix
+        result = torch.zeros((input.shape))
+        # print(result.shape)
+        for i in range(input.shape[2]):
+            temp = input[:,:,i:i+1].squeeze()
+            temp = temp.t()
+            temp = torch.fft.fft(temp).t()
+            result[:,:,i] = torch.fft.fft(temp)
+        return result
+    else:
+        raise ValueError("Input must be 2D or 3D")
+
     return result
 def ifft(input):
     input = input.t()
     result = torch.fft.ifft(input).t()
     return result
 def ifft2(input):
-    input = input.t()
-    input = torch.fft.ifft(input).t()
-    result = torch.fft.ifft(input)
-    return result
-
+    if input.dim() == 2:
+        input = input.t()
+        input = torch.fft.ifft(input).t()
+        result = torch.fft.ifft(input)
+        return result
+    elif input.dim() == 3:
+        result = torch.zeros((input.shape))
+        for i in range(input.shape[2]):
+            temp = input[:,:,i].t()
+            temp = torch.fft.ifft(temp).t()
+            temp = torch.fft.ifft(temp)
+            result[:,:,i] = temp
+        return result
+    else:
+        raise ValueError("Input must be 2D or 3D")
 #Expect sz to be list of dimensions containing two elements
 #expect input to be 2 dimension
 def psf2otf(input, sz):
