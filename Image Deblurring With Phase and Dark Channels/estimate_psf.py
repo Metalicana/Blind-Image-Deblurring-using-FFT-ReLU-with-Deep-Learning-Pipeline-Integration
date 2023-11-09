@@ -9,7 +9,7 @@ def estimate_psf(blurred_x, blurred_y, latent_x, latent_y, weight, psf_size):
     latent_yf = fft2(latent_y)
     blurred_xf = fft2(blurred_x)
     blurred_yf = fft2(blurred_y)
-
+    # print(f'Latent XF {latent_xf.shape} & blurred XF {blurred_xf.shape}')
     b_f = torch.conj(latent_xf) * blurred_xf + torch.conj(latent_yf) * blurred_yf
     b = ifft2(b_f).real
 
@@ -19,8 +19,14 @@ def estimate_psf(blurred_x, blurred_y, latent_x, latent_y, weight, psf_size):
     p_lambda = weight
 
     psf = torch.ones(psf_size) / torch.prod(torch.tensor(psf_size), dtype=torch.float32)
-    psf = conjgrad(psf, b, 20, 1e-5, compute_Ax, (p_m, p_img_size, p_psf_size, p_lambda))
-    
+    dict = {
+        'img_size': p_img_size,
+        'm' : p_m,
+        'psf_size': p_psf_size,
+        'lambda' : p_lambda
+    }
+    # psf = conjgrad(psf, b, 20, 1e-5, compute_Ax, (p_m, p_img_size, p_psf_size, p_lambda))
+    psf = conjgrad(psf, b, 20, 1e-5, compute_Ax, dict)
     psf[psf < torch.max(psf) * 0.05] = 0
     psf /= torch.sum(psf)
     
@@ -28,8 +34,9 @@ def estimate_psf(blurred_x, blurred_y, latent_x, latent_y, weight, psf_size):
 
 def compute_Ax(x, p):
     
-    x_f = psf2otf(x, p['img_size'])
-    y = otf2psf(p['m']*x_f, p['psf_size'])
+    print(p['img_size'])
+    x_f = psf2otf(x, p['img_size'].tolist())
+    y = otf2psf(p['m']*x_f, p['psf_size'].tolist())
     y = y + p['lambda']*x
     # x_f = fft.ifftshift(x)
     # x_f = fft.fftn(x_f, s=p[1])

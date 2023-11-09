@@ -9,6 +9,7 @@ from cho_code.threshold_pxpy_v1 import threshold_pxpy_v1
 from cho_code.opt_fft_size import opt_fft_size
 from L0Deblur_dark_channel import L0Deblur_dark_channel
 from estimate_psf import estimate_psf
+from misc import conv2
 def connected_components(bw):
     labeled_image, num_features = label(bw)
     component_list = []
@@ -34,8 +35,11 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
     # blur_B_w = F.conv2d(blur_B.permute(2, 0, 1).unsqueeze(0), k.permute(2, 3, 0, 1)).squeeze(0).permute(1, 2, 0)
     # print(f'blurB shape: {blur_B.shape}')
     blur_B_w = wrap_boundary_liu(blur_B, opt_fft_size( [H + k.shape[0]-1, W + k.shape[0]-1 ] ))
-    Bx = F.conv2d(blur_B_w.permute(2, 0, 1).unsqueeze(0), dx.unsqueeze(0).unsqueeze(0)).squeeze(0).permute(1, 2, 0)
-    By = F.conv2d(blur_B_w.permute(2, 0, 1).unsqueeze(0), dy.unsqueeze(0).unsqueeze(0)).squeeze(0).permute(1, 2, 0)
+    blur_B_tmp = blur_B[0:H,0:W,:]
+    Bx = conv2(blur_B_tmp, dx, 'valid')
+    By = conv2(blur_B_tmp, dy, 'valid')
+    # Bx = F.conv2d(blur_B_w.permute(2, 0, 1).unsqueeze(0), dx.unsqueeze(0).unsqueeze(0)).squeeze(0).permute(1, 2, 0)
+    # By = F.conv2d(blur_B_w.permute(2, 0, 1).unsqueeze(0), dy.unsqueeze(0).unsqueeze(0)).squeeze(0).permute(1, 2, 0)
     
     for iter in range(1, opts['xk_iter'] + 1):
         if lambda_dark != 0:
