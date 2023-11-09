@@ -3,15 +3,15 @@ import torch.fft as fft
 import torch.nn.functional as F
 from scipy.signal import convolve2d
 from scipy.sparse.linalg import cg
-
+from misc import psf2otf, otf2psf, fft2, ifft2
 def estimate_psf(blurred_x, blurred_y, latent_x, latent_y, weight, psf_size):
-    latent_xf = fft.fft2(latent_x)
-    latent_yf = fft.fft2(latent_y)
-    blurred_xf = fft.fft2(blurred_x)
-    blurred_yf = fft.fft2(blurred_y)
+    latent_xf = fft2(latent_x)
+    latent_yf = fft2(latent_y)
+    blurred_xf = fft2(blurred_x)
+    blurred_yf = fft2(blurred_y)
 
     b_f = torch.conj(latent_xf) * blurred_xf + torch.conj(latent_yf) * blurred_yf
-    b = fft.ifft2(b_f).real
+    b = ifft2(b_f).real
 
     p_m = torch.conj(latent_xf) * latent_xf + torch.conj(latent_yf) * latent_yf
     p_img_size = torch.tensor(latent_xf.shape)
@@ -27,11 +27,15 @@ def estimate_psf(blurred_x, blurred_y, latent_x, latent_y, weight, psf_size):
     return psf
 
 def compute_Ax(x, p):
-    x_f = fft.ifftshift(x)
-    x_f = fft.fftn(x_f, s=p[1])
-    y = fft.ifft2(p[0] * x_f).real
-    y += p[3] * x
-    y = fft.fftshift(y)
+    
+    x_f = psf2otf(x, p['img_size'])
+    y = otf2psf(p['m']*x_f, p['psf_size'])
+    y = y + p['lambda']*x
+    # x_f = fft.ifftshift(x)
+    # x_f = fft.fftn(x_f, s=p[1])
+    # y = fft.ifft2(p[0] * x_f).real
+    # y += p[3] * x
+    # y = fft.fftshift(y)
     return y
 
 def conjgrad(x, b, niter, tol, A, A_args=()):
