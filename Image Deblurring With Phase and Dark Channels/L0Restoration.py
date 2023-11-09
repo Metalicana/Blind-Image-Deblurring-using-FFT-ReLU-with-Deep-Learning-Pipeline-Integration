@@ -26,11 +26,11 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
     # Create otfFx and otfFy
     # otfFx = torch.fft.fftn(fx, s=sizeI2D)
     # otfFy = torch.fft.fftn(fy, s=sizeI2D)
-    otfFx = psf2otf(fx, output_shape=(N,M))
-    otfFy = psf2otf(fy, output_shape=(N,M))
+    otfFx = psf2otf(fx, [N,M])
+    otfFy = psf2otf(fy, [N,M])
     # Create KER and Den_KER
     # KER = torch.fft.fftn(kernel, s=sizeI2D)
-    KER = psf2otf(kernel, output_shape=(N,M))
+    KER = psf2otf(kernel, [N,M])
     Den_KER = torch.abs(KER)**2
     # Create Denormin2
     Denormin2 = torch.abs(otfFx)**2 + torch.abs(otfFy)**2
