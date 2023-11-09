@@ -109,9 +109,16 @@ def ifft2(input):
     result = torch.fft.ifft(input)
     return result
 
-#Expect sz to be list of dimensions
-#expect input to be whatever dimension
+#Expect sz to be list of dimensions containing two elements
+#expect input to be 2 dimension
 def psf2otf(input, sz):
+    if input.ndim!=2:
+        raise ValueError("Please use 2D data.")
+    if not isinstance(sz,list):
+        raise ValueError("Please use list for size parameter.")
+    if len(sz)!=2:
+        raise ValueError("Please use list of length 2 for size parameter.")
+    input = input.to(torch.float32)
     leftShift, topShift = int((input.shape[1]+2) / 2), int((input.shape[0]+2) / 2)
     leftShift -= 1
     topShift -= 1
@@ -123,6 +130,13 @@ def psf2otf(input, sz):
     return result
 
 def otf2psf(input, sz):
+    if input.ndim!=2:
+        raise ValueError("Please use 2D data")
+    if not isinstance(sz,list):
+        raise ValueError("Please use list for size parameter.")
+    if len(sz)!=2:
+        raise ValueError("Please use list of length 2 for size parameter.")
+    input = input.to(torch.float32)
     input = ifft2(input)
     shiftRight, shiftBottom = int((input.shape[1]+2)/2) , int((input.shape[0]+2)/2)
     centerX, centerY = shiftBottom, shiftRight
@@ -137,3 +151,11 @@ def otf2psf(input, sz):
     left =int(sz[1] / 2)
     right = sz[1] - left - 1
     return torch.real(result[centerX-top:centerX+bottom+1, centerY-left:centerY+right+1])
+
+
+def custompad(tensor, pad):
+    tensor2 = tensor.transpose(0,2)
+    tensor2 = tensor2.to(torch.float32)
+    tensor2 = F.pad(tensor2, (pad, pad, pad, pad), mode = "replicate")
+    tensor2 = tensor2.transpose(0,2)
+    return tensor2

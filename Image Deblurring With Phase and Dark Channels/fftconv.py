@@ -1,10 +1,11 @@
 import torch
 import torch.fft as fft
-
+from misc import psf2otf
 def fftconv(I, filt, b_otf=False):
     if I.ndim == 3:
         H, W, ch = I.shape
-        otf = torch.fft.fftn(filt, s=(H, W))
+        output_size = [H, W]
+        otf = psf2otf(filt, output_size)
         cI = torch.zeros_like(I)
         for i in range(ch):
             cI[..., i] = fftconv(I[..., i], otf, True)

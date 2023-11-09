@@ -1,19 +1,28 @@
 import torch
 import torch.fft as fft
 import torch.nn.functional as F
-from cho_code import wrap_boundary_liu, opt_fft_size
-import bilateral_filter
-import deblurring_adm_aniso
+from cho_code.opt_fft_size import opt_fft_size
+from cho_code.wrap_boundary_liu import wrap_boundary_liu
+from bilateral_filter import bilateral_filter
+from deblurring_adm_aniso import deblurring_adm_aniso
 from L0Restoration import L0Restoration
 def ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring):
-    H, W, _ = y.shape
-    y_pad = wrap_boundary_liu(y, opt_fft_size([H, W] + list(kernel.shape)) - 1)
-    Latent_tv = []
+    H, W, C = y.shape
+    dim_list = [H, W]
+    param = [x + y - 1 for x, y in zip(dim_list, list(kernel.shape))]
+    p = opt_fft_size(param)
+    y_pad = wrap_boundary_liu(y, p)
+
+    Latent_tv = torch.Tensor()
     
-    for c in range(y.shape[2]):
-        Latent_tv.append(deblurring_adm_aniso(y_pad[:, :, c], kernel, lambda_tv, 1))
-    
-    Latent_tv = torch.stack(Latent_tv, dim=2)
+    for c in range(C):
+        aniso = deblurring_adm_aniso(y_pad[:, :, c], kernel, lambda_tv, 1)
+        n = aniso.ndim
+        aniso = aniso.unsqueeze(n)
+        Latent_tv = torch.cat((Latent_tv,aniso),dim = n)
+    print("TV")
+    print(Latent_tv.shape)
+    print(Latent_tv)
     Latent_tv = Latent_tv[:H, :W, :]
     
     if weight_ring == 0:
@@ -32,4 +41,9 @@ def ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring):
 # Replace y and kernel with your input image and kernel
 # y should be a PyTorch tensor with shape (H, W, C) and kernel should be a PyTorch tensor with shape (kernel_size, kernel_size)
 # lambda_tv, lambda_l0, and weight_ring are hyperparameters you can adjust
-# result = ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring)
+# result = _artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring)
+
+img = torch.arange(1, 250*250*3 + 1).reshape((250, 250, 3))
+ker = torch.arange(1, 25*25 + 1).reshape(25,25)
+
+t = ringing_artifacts_removal(img,ker,0.002,0.0002,1)
