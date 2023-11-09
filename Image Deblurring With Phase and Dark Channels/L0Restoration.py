@@ -1,16 +1,13 @@
 import torch
-import torch.fft as fft
-import torch.nn.functional as F
 from cho_code.wrap_boundary_liu import wrap_boundary_liu
 from cho_code.opt_fft_size import opt_fft_size
-from misc import psf2otf
+from misc import psf2otf, fft, fft2
 def L0Restoration(Im, kernel, lambda_, kappa=2.0):
     if not kappa:
         kappa = 2.0
     
     # Get image dimensions
     H, W, D = Im.shape
-    sizeI2D = [H, W]
     # Pad image
     #opt_fft_size expects a python list
     # [H + k.shape[0]-1, W + k.shape[0]-1 ]
@@ -18,20 +15,20 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
     
     # Initialize S
     S = Im.clone()
-    #print(S.shape)
+    print(S.shape)
     betamax = 1e5
-    fx = torch.tensor([1, -1], dtype=torch.float32)
-    fy = torch.tensor([1, -1], dtype=torch.float32)
+    fx = torch.tensor([[1, -1]], dtype=torch.float32)
+    fy = fx.t()
     N, M, D = Im.shape
     
     # Create otfFx and otfFy
     # otfFx = torch.fft.fftn(fx, s=sizeI2D)
     # otfFy = torch.fft.fftn(fy, s=sizeI2D)
-    otfFx = psf2otf(fx, output_shape=(N,M))
-    otfFy = psf2otf(fy, output_shape=(N,M))
+    otfFx = psf2otf(fx, [N,M])
+    otfFy = psf2otf(fy, [N,M])
     # Create KER and Den_KER
     # KER = torch.fft.fftn(kernel, s=sizeI2D)
-    KER = psf2otf(kernel, output_shape=(N,M))
+    KER = psf2otf(kernel, [N,M])
     Den_KER = torch.abs(KER)**2
     
     # Create Denormin2
@@ -41,7 +38,7 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
         KER = KER.unsqueeze(dim=2).expand(-1, -1, D)
         Den_KER = Den_KER.unsqueeze(dim=2).expand(-1, -1, D)
     #print(f'Kernel dims {KER.shape}, S shape {S.shape}')
-    Normin1 = torch.conj(KER) * fft.fftn(S)
+    Normin1 = torch.conj(KER) * fft2(S)
     
     beta = 2 * lambda_
     while beta < betamax:
@@ -79,7 +76,7 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
         v2 = -torch.diff(v,dim=0)
         v1 = v1.unsqueeze(0)
         Normin2 += torch.cat((v1,v2))
-        FS = (Normin1 + beta * fft.fftn(Normin2)) / Denormin
+        FS = (Normin1 + beta * fft2(Normin2)) / Denormin
         S = fft.ifftn(FS).real
        
         beta *= kappa
@@ -88,25 +85,6 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
     S = S[:H, :W, :]
     
     return S
-def psf2otf(psf, output_shape):
-    # Check if psf is a 1D or 2D tensor
-    if len(psf.shape) == 1:
-        # If psf is a 1D vector, reshape it to a 2D matrix
-        psf = psf.view(1, -1)
-    
-    # Calculate the center of the PSF
-    psf_center = torch.tensor(psf.shape) // 2
-
-    # Pad the PSF to match the desired output shape
-    psf_padded = torch.nn.functional.pad(psf, (0, output_shape[1] - psf.shape[1], 0, output_shape[0] - psf.shape[0]))
-
-    # Shift the padded PSF to the center
-    psf_shifted = torch.roll(psf_padded, shifts=tuple(psf_center), dims=(1, 0))
-
-    # Compute the Fourier Transform of the shifted PSF
-    otf = fft.fftn(psf_shifted)
-
-    return otf
 # Usage
 # Replace Im and kernel with your input image and kernel
 # Im should be a PyTorch tensor with shape (H, W, D) and kernel should be a PyTorch tensor with shape (kernel_size, kernel_size)

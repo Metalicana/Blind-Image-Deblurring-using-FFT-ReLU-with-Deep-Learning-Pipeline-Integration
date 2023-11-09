@@ -46,4 +46,3 @@ def ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring):
 img = torch.arange(1, 250*250*3 + 1).reshape((250, 250, 3))
 ker = torch.arange(1, 25*25 + 1).reshape(25,25)
 
-t = ringing_artifacts_removal(img,ker,0.002,0.0002,1)

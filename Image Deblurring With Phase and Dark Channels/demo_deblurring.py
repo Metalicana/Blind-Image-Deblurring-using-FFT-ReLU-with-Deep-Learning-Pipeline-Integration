@@ -5,7 +5,7 @@ from PIL import Image
 import cv2
 import os
 from blind_deconv import blind_deconv
-import ringing_artifacts_removal
+from ringing_artifacts_removal import ringing_artifacts_removal
 from misc import visualize_image
 # Import your Python implementations of necessary functions here.
 
