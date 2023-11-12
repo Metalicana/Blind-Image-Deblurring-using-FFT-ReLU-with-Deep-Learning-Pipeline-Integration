@@ -21,7 +21,6 @@ def connected_components(bw):
     CC = {}
     CC["NumObjects"] = num_features
     CC["PixelIdxList"] = component_list
-
     return CC
 
 def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
