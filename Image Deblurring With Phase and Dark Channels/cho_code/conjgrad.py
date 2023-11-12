@@ -1,6 +1,9 @@
 import torch
 
 def conjgrad(x, b, maxIt, tol, Ax_func, func_param, visfunc=None):
+    print(f'inside conjgrad b shape {b.shape}')
+    x = Ax_func(x, func_param)
+    print(f'inside conjgrad ax_func result shape {x.shape}')
     r = b - Ax_func(x, func_param)
     p = r
     rsold = torch.sum(r * r)
