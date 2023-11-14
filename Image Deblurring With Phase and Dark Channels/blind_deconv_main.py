@@ -10,6 +10,12 @@ from cho_code.opt_fft_size import opt_fft_size
 from L0Deblur_dark_channel import L0Deblur_dark_channel
 from estimate_psf import estimate_psf
 from misc import conv2
+#expect to return a dictionary,
+#Where NumObjects wil refer to how many different connected components there are
+#Each array of CC["pixelIdxList"] will contain list of indices of the that particular connected component
+# So, CC["pixelIdxList"] is a 2D array, where CC["pixelIdxList"][I][J] referes to the Ith connected components'
+# Jth index (the indices are of course 2D tuple (X, Y ) value)
+
 def connected_components(bw):
     labeled_image, num_features = label(bw)
     component_list = []
@@ -58,6 +64,8 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
         k = estimate_psf(Bx, By, latent_x, latent_y, 2, k_prev.size())
         
         # Prune isolated noise in the kernel
+        
+
         CC = connected_components(k)
         for ii in range(1, CC['NumObjects'] + 1):
             currsum = torch.sum(k[CC['PixelIdxList'][ii - 1]])
