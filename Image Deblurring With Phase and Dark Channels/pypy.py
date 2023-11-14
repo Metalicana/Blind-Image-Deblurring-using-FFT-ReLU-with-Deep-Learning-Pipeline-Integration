@@ -118,15 +118,15 @@ from misc import ifft2
 from misc import otf2psf
 
 hogarBal = psf2otf(latent_tensor, [15,15])
-print(hogarBal)
+# print(hogarBal)
 putkirBal = otf2psf(hogarBal, [10,10])
-print(torch.abs(putkirBal))
+# print(torch.abs(putkirBal))
 # haha = ifft2(hogarBal)
 x = torch.tensor([[1,-1]])
 y = psf2otf(x, [5,5])
-print(y)
+# print(y)
 z = otf2psf(y,[1,2])
-print(z)
+# print(z)
 
 # print(torch.abs(haha))
 
@@ -266,7 +266,25 @@ print(z)
 
 
 # print(threshold)
-a = torch.ones((5,5,1))
-b = torch.ones((5,5))
-c = a*b
-print(c)
+from skimage import measure
+grid = [[0, 0, 0, 0, 0, 0, 0],
+        [0, 0.0144, 0.0530, 0.0627, 0.0373, 0, 0],
+        [0.0402, 0.1092, 0.1773, 0.1757, 0.1035, 0.0344, 0.0125],
+        [0.0165, 0.0392, 0.0398, 0.0386, 0.0257, 0.0102, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0.0098, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0]]
+
+# Convert the grid to a PyTorch tensor
+tensor = torch.as_tensor(grid)
+print(tensor)
+binary_image = tensor.numpy()
+binary_image[binary_image>0] = 1
+# print (measure.label(binary_image, background=0.,connectivity=1))
+print(measure.label(binary_image))
+# properties = measure.regionprops(labeled_image)
+# print(binary_image)
+# # Print the tensor
+# print(labeled_image)
+
+# print(properties)
