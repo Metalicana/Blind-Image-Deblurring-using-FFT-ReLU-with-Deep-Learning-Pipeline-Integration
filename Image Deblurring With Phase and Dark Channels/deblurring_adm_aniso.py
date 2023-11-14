@@ -49,7 +49,7 @@ def deblurring_adm_aniso(B, k, lambda_val, alpha):
         raise ValueError("Blur kernel k must be odd-sized.")
 
     Nomin1, Denom1, Denom2 = computeDenominator(B, k)
-    print(Denom2)
+    #print(Denom2)
 
     Ix, Iy = row_col_diff_pair(I)
     
@@ -77,8 +77,8 @@ def deblurring_adm_aniso(B, k, lambda_val, alpha):
         a = Wx[:,-1]-Wx[:,0]
         b = -torch.diff(Wx,1,1)
         Wxx = torch.cat((a.view(a.shape[0],1),b), dim = 1)
-        print("WXX")
-        print(Wxx)
+        #print("WXX")
+        #print(Wxx)
         a = Wy[-1,:]-Wy[0,:]
         b = -torch.diff(Wy,1,0)
         Wxx = Wxx + torch.cat((a.view(1,a.shape[0]),b))
@@ -106,4 +106,4 @@ ker = torch.arange(1, 5*5 + 1).reshape(5,5)
 
 t = deblurring_adm_aniso(img,ker,0.002,1)
 
-print(t)
+#print(t)

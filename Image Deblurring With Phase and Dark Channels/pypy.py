@@ -278,10 +278,25 @@ grid = [[0, 0, 0, 0, 0, 0, 0],
 # Convert the grid to a PyTorch tensor
 tensor = torch.as_tensor(grid)
 print(tensor)
-binary_image = tensor.numpy()
+binary_image = tensor.clone()
+binary_image = binary_image.numpy()
 binary_image[binary_image>0] = 1
 # print (measure.label(binary_image, background=0.,connectivity=1))
-print(measure.label(binary_image))
+t = measure.label(binary_image)
+print("TT")
+print(tensor)
+t = torch.from_numpy(t)
+num = torch.max(t)
+threshold = 0.1
+print("")
+for n in range(1, num+1):
+    indices = torch.nonzero(t == n).tolist()
+    sum = tensor[torch.tensor(indices)[:, 0], torch.tensor(indices)[:, 1]].sum()
+    if sum<threshold:
+        for index in indices:
+            tensor[index[0], index[1]] = 0
+
+print(tensor)
 # properties = measure.regionprops(labeled_image)
 # print(binary_image)
 # # Print the tensor
