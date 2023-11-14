@@ -277,18 +277,19 @@ grid = [[0, 0, 0, 0, 0, 0, 0],
 
 # Convert the grid to a PyTorch tensor
 tensor = torch.as_tensor(grid)
+t2 = tensor.clone()
 print(tensor)
 binary_image = tensor.clone()
 binary_image = binary_image.numpy()
 binary_image[binary_image>0] = 1
 # print (measure.label(binary_image, background=0.,connectivity=1))
 t = measure.label(binary_image)
-print("TT")
-print(tensor)
+
+#print(tensor)
 t = torch.from_numpy(t)
 num = torch.max(t)
 threshold = 0.1
-print("")
+#print("")
 for n in range(1, num+1):
     indices = torch.nonzero(t == n).tolist()
     sum = tensor[torch.tensor(indices)[:, 0], torch.tensor(indices)[:, 1]].sum()
@@ -296,7 +297,25 @@ for n in range(1, num+1):
         for index in indices:
             tensor[index[0], index[1]] = 0
 
-print(tensor)
+#print(tensor)
+def connected_components(bw):
+    CC = {}
+    t = bw.clone()
+    t = t.numpy()
+    t[t>0] = 1
+    lbl = measure.label(t)
+    lbl = torch.from_numpy(lbl)
+    x = torch.max(lbl)
+    CC['NumObjects'] = x
+    CC['PixelIdxList'] = []
+    num = CC['NumObjects']
+    for n in range(1, num+1):
+        indices = torch.nonzero(lbl == n).tolist()
+        CC['PixelIdxList'].append(indices)
+
+    return CC
+
+print(connected_components(t2))
 # properties = measure.regionprops(labeled_image)
 # print(binary_image)
 # # Print the tensor

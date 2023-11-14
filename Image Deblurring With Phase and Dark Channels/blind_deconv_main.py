@@ -10,6 +10,7 @@ from cho_code.opt_fft_size import opt_fft_size
 from L0Deblur_dark_channel import L0Deblur_dark_channel
 from estimate_psf import estimate_psf
 from misc import conv2
+from skimage import measure
 #expect to return a dictionary,
 #Where NumObjects wil refer to how many different connected components there are
 #Each array of CC["pixelIdxList"] will contain list of indices of the that particular connected component
@@ -17,16 +18,19 @@ from misc import conv2
 # Jth index (the indices are of course 2D tuple (X, Y ) value)
 
 def connected_components(bw):
-    labeled_image, num_features = label(bw)
-    component_list = []
-    
-    for label_id in range(1, num_features + 1):
-        component = (labeled_image == label_id)
-        component_list.append(component)
-    
     CC = {}
-    CC["NumObjects"] = num_features
-    CC["PixelIdxList"] = component_list
+    t = bw.clone()
+    t = t.numpy()
+    t[t>0] = 1
+    lbl = measure.label(t)
+    lbl = torch.from_numpy(lbl)
+    num = torch.max(lbl)
+    CC['NumObjects'] = num
+    CC['PixelIdxList'] = []
+    for n in range(1, num+1):
+        indices = torch.nonzero(lbl == n).tolist()
+        CC['PixelIdxList'].append(indices)
+
     return CC
 
 def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
