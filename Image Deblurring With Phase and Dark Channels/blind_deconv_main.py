@@ -72,9 +72,10 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
 
         CC = connected_components(k)
         for ii in range(1, CC['NumObjects'] + 1):
-            currsum = torch.sum(k[CC['PixelIdxList'][ii - 1]])
+            idx = torch.tensor(CC['PixelIdxList'][ii-1])
+            currsum = k[idx[:,0], idx[:,1]].sum()
             if currsum < 0.1:
-                k[CC['PixelIdxList'][ii - 1]] = 0
+                k[idx[:,0],idx[:,1]] = 0
         
         k[k < 0] = 0
         k /= torch.sum(k)
