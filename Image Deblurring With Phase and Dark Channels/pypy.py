@@ -362,3 +362,24 @@ tensor_kernel = torch.tensor(kernel_np)
 from L0Restoration import L0Restoration
 
 S = L0Restoration(mat.unsqueeze(2), tensor_kernel, .1415, 2.0)
+
+#Testing Estimate PSF
+# blurred_x = torch.arange(1,120*120 + 1).reshape(120,120).type(torch.float32)
+# blurred_x /= (120.0*120.0)
+# print(blurred_x[0:5,0:5])
+
+# blurred_y = torch.arange(120*120+1, 2*120*120 + 1).reshape(120,120).type(torch.float32)
+# blurred_y /= (2* 120.0*120.0)
+# print(blurred_y[0:5,0:5])
+
+# latent_x = torch.arange(2*120*120+1, 3*120*120 + 1).reshape(120,120).type(torch.float32)
+# latent_x /= (3* 120.0*120.0)
+# print(latent_x[0:5,0:5])
+
+# latent_y = torch.arange(3*120*120+1, 4*120*120 + 1).reshape(120,120).type(torch.float32)
+# latent_y /= (4* 120.0*120.0)
+# print(latent_y[0:5,0:5])
+
+# from estimate_psf import estimate_psf
+
+# print(estimate_psf(blurred_x, blurred_y, latent_x, latent_y, 2, [9,9]))

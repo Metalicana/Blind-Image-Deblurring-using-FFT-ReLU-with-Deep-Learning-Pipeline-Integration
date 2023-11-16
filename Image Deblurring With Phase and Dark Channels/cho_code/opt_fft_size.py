@@ -4,7 +4,7 @@ opt_fft_size_LUT = None
 #Expected input is a list of numbers representing the dimension of the image
 def opt_fft_size(n):
     LUT_size = 4097
-
+    
     global opt_fft_size_LUT
     if(opt_fft_size_LUT is None):
         print('generating optimal fft size Look up table')
@@ -18,11 +18,11 @@ def opt_fft_size(n):
                     e7 = e5
                     while e7 < LUT_size:
                         if e7 < LUT_size:
-                            opt_fft_size_LUT[e7 - 1] = e7
+                            opt_fft_size_LUT[e7 ] = e7
                         if e7 * 11 < LUT_size:
-                            opt_fft_size_LUT[e7 * 11 - 1] = e7 * 11
+                            opt_fft_size_LUT[e7 * 11 ] = e7 * 11
                         if e7 * 13 < LUT_size:
-                            opt_fft_size_LUT[e7 * 13 - 1] = e7 * 13
+                            opt_fft_size_LUT[e7 * 13 ] = e7 * 13
                         e7 *= 7
                     e5 *= 5
                 e3 *= 3
@@ -31,7 +31,7 @@ def opt_fft_size(n):
         nn = 0
         for i in range(LUT_size - 1, 0, -1):
             if opt_fft_size_LUT[i] != 0:
-                nn = opt_fft_size_LUT[i]
+                nn = i
             else:
                 opt_fft_size_LUT[i] = nn
     # let m be a list as well
@@ -42,5 +42,5 @@ def opt_fft_size(n):
             m[c] = opt_fft_size_LUT[nn]
         else:
             m[c] = -1
-
+    print(f'yolo {m}')
     return m
