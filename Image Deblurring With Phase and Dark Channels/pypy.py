@@ -322,26 +322,44 @@ z = otf2psf(y,[1,2])
 # print(labeled_image)
 
 # print(properties)
-import cv2
-from PIL import Image
-import torchvision.transforms as transforms
 
-image_path = 'images/post_blur.png'
-ipt = Image.open(image_path)
+#Image to tensor
+# import cv2
+# from PIL import Image
+# import torchvision.transforms as transforms
 
-def process_image(input_image) -> torch.Tensor:
-  transform = transforms.Compose([
-      transforms.PILToTensor()
-  ])
-  input_tensor = transform(input_image).type(torch.float32)
-  return input_tensor
+# image_path = 'images/post_blur.png'
+# ipt = Image.open(image_path)
+
+# def process_image(input_image) -> torch.Tensor:
+#   transform = transforms.Compose([
+#       transforms.PILToTensor()
+#   ])
+#   input_tensor = transform(input_image).type(torch.float32)
+#   return input_tensor
 
 
-image = process_image(ipt)
-image = image.permute(1,2,0)
+# image = process_image(ipt)
+# image = image.permute(1,2,0)
 
-true_gray = image[:,:,0]*0.299+ image[:,:,1]*0.587 + image[:,:,2]*0.114
-print(torch.round(true_gray))
-true_gray = true_gray / 255.0
-print(true_gray)
+# true_gray = image[:,:,0]*0.299+ image[:,:,1]*0.587 + image[:,:,2]*0.114
+# print(torch.round(true_gray))
+# true_gray = true_gray / 255.0
+# print(true_gray)
+import numpy as np
+mat = torch.arange(1,120*120 + 1).reshape(120,120).type(torch.float32)
+mat /= (120*120)
 
+
+kernel_np = np.eye(7, dtype=np.float32)
+
+
+
+# Convert the NumPy array to a PyTorch tensor
+tensor_kernel = torch.tensor(kernel_np)
+
+
+from L0Restoration import L0Restoration
+
+S = L0Restoration(mat.unsqueeze(2), tensor_kernel, .1415, 2.0)
+# print(S.squeeze())

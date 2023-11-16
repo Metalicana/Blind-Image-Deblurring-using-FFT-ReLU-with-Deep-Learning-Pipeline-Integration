@@ -11,8 +11,11 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
     # Pad image
     #opt_fft_size expects a python list
     # [H + k.shape[0]-1, W + k.shape[0]-1 ]
+
+    #THIS COMMENT IS ONLY FOR TESTING PUT IT BACK TO HOW IT WAS
     Im = wrap_boundary_liu(Im, opt_fft_size([H + kernel.shape[0] - 1, W + kernel.shape[1] - 1 ]))
-    
+    print('im here')
+    print(Im.squeeze().shape)
     # Initialize S
     S = Im.clone()
     # print(S.shape)
@@ -37,7 +40,7 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
         Denormin2 = Denormin2.unsqueeze(dim=2).expand(-1, -1, D)
         KER = KER.unsqueeze(dim=2).expand(-1, -1, D)
         Den_KER = Den_KER.unsqueeze(dim=2).expand(-1, -1, D)
-    print(f'Kernel dims {KER.shape}, S shape {S.shape}')
+    # print(f'Kernel dims {KER.shape}, S shape {S.shape}')
     Normin1 = torch.conj(KER).unsqueeze(-1).expand_as(S) * fft2(S)
     
     beta = 2 * lambda_

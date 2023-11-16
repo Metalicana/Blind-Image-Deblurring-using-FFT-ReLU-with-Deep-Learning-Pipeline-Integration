@@ -43,6 +43,8 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
     # Wrap boundary for convolution
     # blur_B_w = F.conv2d(blur_B.permute(2, 0, 1).unsqueeze(0), k.permute(2, 3, 0, 1)).squeeze(0).permute(1, 2, 0)
     # print(f'blurB shape: {blur_B.shape}')
+
+    #THIS COMMENTED LINE IS ABSOLUTELY CRUCIAL 
     blur_B_w = wrap_boundary_liu(blur_B, opt_fft_size( [H + k.shape[0]-1, W + k.shape[0]-1 ] ))
     blur_B_tmp = blur_B[0:H,0:W,:]
     Bx = conv2(blur_B_tmp, dx, 'valid')
@@ -55,9 +57,9 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
             S = L0Deblur_dark_channel(blur_B_w, k, lambda_dark, lambda_grad, 2.0)
             S = S[0:H, 0:W, :]
         else:
-            print(f'before L0 restoration S shape {blur_B.shape}')
+            # print(f'before L0 restoration S shape {blur_B.shape}')
             S = L0Restoration(blur_B, k, lambda_grad, 2.0)
-            print(f'After L0 restoration S shape {S.shape}')
+            # print(f'After L0 restoration S shape {S.shape}')
         
         latent_x, latent_y, threshold = threshold_pxpy_v1(S, max(k.size()), threshold)
         
@@ -68,7 +70,8 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
         k = estimate_psf(Bx, By, latent_x, latent_y, 2, k_prev.size())
         
         # Prune isolated noise in the kernel
-        
+        # print('printing kernel after L0Restoration and estimate PSF')
+        # print(k)
 
         CC = connected_components(k)
         for ii in range(1, CC['NumObjects'] + 1):
