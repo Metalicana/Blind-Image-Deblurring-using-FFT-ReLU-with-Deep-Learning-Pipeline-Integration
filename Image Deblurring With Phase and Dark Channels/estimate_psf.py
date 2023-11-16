@@ -12,7 +12,7 @@ def estimate_psf(blurred_x, blurred_y, latent_x, latent_y, weight, psf_size):
     blurred_yf = fft2(blurred_y)
     # print(f'Latent XF {latent_xf.shape} & blurred XF {blurred_xf.shape}')
     b_f = torch.conj(latent_xf) * blurred_xf + torch.conj(latent_yf) * blurred_yf
-    print(b_f.shape)
+    # print(b_f.shape)
     b = otf2psf(b_f.squeeze(), torch.tensor(psf_size).tolist())
     # print(f'b inside estimate psf {b.shape}')
     p_m = torch.conj(latent_xf) * latent_xf + torch.conj(latent_yf) * latent_yf

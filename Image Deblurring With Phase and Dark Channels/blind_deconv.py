@@ -34,6 +34,8 @@ def blind_deconv(y, lambda_dark, lambda_grad, opts):
             ks = init_kernel(k1list[s - 1]).to(torch.float32)
             k1 = k1list[s - 1].to(torch.int)
             k2 = k1.to(torch.int)
+            print('heyooooo')
+            print(ks)
         else:
             k1 = k1list[s - 1].to(torch.int)
             k2 = k1.to(torch.int)
@@ -49,7 +51,8 @@ def blind_deconv(y, lambda_dark, lambda_grad, opts):
             _, _, threshold = threshold_pxpy_v1(ys, torch.tensor(max(k1, k2)) )
         print(f'shape of input before going into blind_deconv_main {ys.unsqueeze(2).shape}')
         ks, lambda_dark, lambda_grad, interim_latent = blind_deconv_main(ys.unsqueeze(2), ks, lambda_dark, lambda_grad, threshold, opts)
-        ks = adjust_psf_center(ks)
+        #remember to fix this later on 
+        # ks = adjust_psf_center(ks)
         ks[ks < 0] = 0
         sumk = ks.sum()
         ks /= sumk

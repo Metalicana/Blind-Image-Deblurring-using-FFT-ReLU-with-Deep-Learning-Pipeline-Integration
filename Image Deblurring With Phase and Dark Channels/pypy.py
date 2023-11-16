@@ -266,59 +266,82 @@ z = otf2psf(y,[1,2])
 
 
 # print(threshold)
-from skimage import measure
-grid = [[0, 0, 0, 0, 0, 0, 0],
-        [0, 0.0144, 0.0530, 0.0627, 0.0373, 0, 0],
-        [0.0402, 0.1092, 0.1773, 0.1757, 0.1035, 0.0344, 0.0125],
-        [0.0165, 0.0392, 0.0398, 0.0386, 0.0257, 0.0102, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0.0098, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0]]
+# from skimage import measure
+# grid = [[0, 0, 0, 0, 0, 0, 0],
+#         [0, 0.0144, 0.0530, 0.0627, 0.0373, 0, 0],
+#         [0.0402, 0.1092, 0.1773, 0.1757, 0.1035, 0.0344, 0.0125],
+#         [0.0165, 0.0392, 0.0398, 0.0386, 0.0257, 0.0102, 0],
+#         [0, 0, 0, 0, 0, 0, 0],
+#         [0, 0, 0.0098, 0, 0, 0, 0],
+#         [0, 0, 0, 0, 0, 0, 0]]
 
-# Convert the grid to a PyTorch tensor
-tensor = torch.as_tensor(grid)
-t2 = tensor.clone()
-print(tensor)
-binary_image = tensor.clone()
-binary_image = binary_image.numpy()
-binary_image[binary_image>0] = 1
-# print (measure.label(binary_image, background=0.,connectivity=1))
-t = measure.label(binary_image)
+# # Convert the grid to a PyTorch tensor
+# tensor = torch.as_tensor(grid)
+# t2 = tensor.clone()
+# print(tensor)
+# binary_image = tensor.clone()
+# binary_image = binary_image.numpy()
+# binary_image[binary_image>0] = 1
+# # print (measure.label(binary_image, background=0.,connectivity=1))
+# t = measure.label(binary_image)
 
-#print(tensor)
-t = torch.from_numpy(t)
-num = torch.max(t)
-threshold = 0.1
-#print("")
-for n in range(1, num+1):
-    indices = torch.nonzero(t == n).tolist()
-    sum = tensor[torch.tensor(indices)[:, 0], torch.tensor(indices)[:, 1]].sum()
-    if sum<threshold:
-        for index in indices:
-            tensor[index[0], index[1]] = 0
+# #print(tensor)
+# t = torch.from_numpy(t)
+# num = torch.max(t)
+# threshold = 0.1
+# #print("")
+# for n in range(1, num+1):
+#     indices = torch.nonzero(t == n).tolist()
+#     sum = tensor[torch.tensor(indices)[:, 0], torch.tensor(indices)[:, 1]].sum()
+#     if sum<threshold:
+#         for index in indices:
+#             tensor[index[0], index[1]] = 0
 
-#print(tensor)
-def connected_components(bw):
-    CC = {}
-    t = bw.clone()
-    t = t.numpy()
-    t[t>0] = 1
-    lbl = measure.label(t)
-    lbl = torch.from_numpy(lbl)
-    x = torch.max(lbl)
-    CC['NumObjects'] = x
-    CC['PixelIdxList'] = []
-    num = CC['NumObjects']
-    for n in range(1, num+1):
-        indices = torch.nonzero(lbl == n).tolist()
-        CC['PixelIdxList'].append(indices)
+# #print(tensor)
+# def connected_components(bw):
+#     CC = {}
+#     t = bw.clone()
+#     t = t.numpy()
+#     t[t>0] = 1
+#     lbl = measure.label(t)
+#     lbl = torch.from_numpy(lbl)
+#     x = torch.max(lbl)
+#     CC['NumObjects'] = x
+#     CC['PixelIdxList'] = []
+#     num = CC['NumObjects']
+#     for n in range(1, num+1):
+#         indices = torch.nonzero(lbl == n).tolist()
+#         CC['PixelIdxList'].append(indices)
 
-    return CC
+#     return CC
 
-print(connected_components(t2))
+# print(connected_components(t2))
 # properties = measure.regionprops(labeled_image)
 # print(binary_image)
 # # Print the tensor
 # print(labeled_image)
 
 # print(properties)
+import cv2
+from PIL import Image
+import torchvision.transforms as transforms
+
+image_path = 'images/post_blur.png'
+ipt = Image.open(image_path)
+
+def process_image(input_image) -> torch.Tensor:
+  transform = transforms.Compose([
+      transforms.PILToTensor()
+  ])
+  input_tensor = transform(input_image).type(torch.float32)
+  return input_tensor
+
+
+image = process_image(ipt)
+image = image.permute(1,2,0)
+
+true_gray = image[:,:,0]*0.299+ image[:,:,1]*0.587 + image[:,:,2]*0.114
+print(torch.round(true_gray))
+true_gray = true_gray / 255.0
+print(true_gray)
+

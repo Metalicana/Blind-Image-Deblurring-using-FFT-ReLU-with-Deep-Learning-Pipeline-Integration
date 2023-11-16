@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 
 def adjust_psf_center(psf):
+    print(psf)
     psf_height, psf_width = psf.shape
     Y, X = torch.meshgrid(torch.arange(1,psf_height+1), torch.arange(1,psf_width+1))
     xc1 = torch.sum(psf * X)

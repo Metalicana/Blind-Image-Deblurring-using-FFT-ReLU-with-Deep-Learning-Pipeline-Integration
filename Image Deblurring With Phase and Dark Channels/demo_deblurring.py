@@ -44,12 +44,18 @@ def main():
         # Allow the user to select a specific area for deblurring (not implemented in this example)
         pass
     else:
-        yg = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY) / 255.0
+        yg = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
         yg = torch.from_numpy(yg).type(torch.float32)
+        mn = torch.min(yg)
+        mx = torch.max(yg)
+        yg = yg / 255.0
     # Perform blind deconvolution
 
     kernel, interim_latent = blind_deconv(yg, lambda_dark, lambda_grad, opts)
-
+    plt.figure(figsize=(12, 6))
+    plt.imshow(kernel, cmap='gray')
+    plt.title('Estimated Kernel')
+    plt.show()
     # Perform non-blind deconvolution
     saturation = 0  # Set this to 1 if the image is saturated
     if not saturation:
