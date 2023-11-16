@@ -14,8 +14,8 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
 
     #THIS COMMENT IS ONLY FOR TESTING PUT IT BACK TO HOW IT WAS
     Im = wrap_boundary_liu(Im, opt_fft_size([H + kernel.shape[0] - 1, W + kernel.shape[1] - 1 ]))
-    print('im here')
-    print(Im.squeeze().shape)
+    # print('im here')
+    # print(Im.squeeze().shape)
     # Initialize S
     S = Im.clone()
     # print(S.shape)
@@ -29,20 +29,23 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
     # otfFy = torch.fft.fftn(fy, s=sizeI2D)
     otfFx = psf2otf(fx, [N,M])
     otfFy = psf2otf(fy, [N,M])
+
     # Create KER and Den_KER
     # KER = torch.fft.fftn(kernel, s=sizeI2D)
     KER = psf2otf(kernel, [N,M])
     Den_KER = torch.abs(KER)**2
     
+    
     # Create Denormin2
     Denormin2 = torch.abs(otfFx)**2 + torch.abs(otfFy)**2
+    
     if D > 1:
         Denormin2 = Denormin2.unsqueeze(dim=2).expand(-1, -1, D)
         KER = KER.unsqueeze(dim=2).expand(-1, -1, D)
         Den_KER = Den_KER.unsqueeze(dim=2).expand(-1, -1, D)
     # print(f'Kernel dims {KER.shape}, S shape {S.shape}')
     Normin1 = torch.conj(KER).unsqueeze(-1).expand_as(S) * fft2(S)
-    
+    # print(fft2(S).squeeze())
     beta = 2 * lambda_
     while beta < betamax:
         Denormin = Den_KER + beta * Denormin2

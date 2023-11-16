@@ -124,13 +124,14 @@ def fft2(input):
         result = torch.fft.fft(input)
     elif input.dim() == 3:
         # If input is 3D, apply FFT along the last dimension for each 2D matrix
-        result = torch.zeros((input.shape))
+        result = torch.zeros((input.shape)).type(torch.complex64)
         # print(result.shape)
         for i in range(input.shape[2]):
             temp = input[:,:,i:i+1].squeeze()
             temp = temp.t()
             temp = torch.fft.fft(temp).t()
             result[:,:,i] = torch.fft.fft(temp)
+            # print(result.dtype)
         return result
     else:
         raise ValueError("Input must be 2D or 3D")
@@ -147,7 +148,7 @@ def ifft2(input):
         result = torch.fft.ifft(input)
         return result
     elif input.dim() == 3:
-        result = torch.zeros((input.shape))
+        result = torch.zeros((input.shape)).type(torch.complex64)
         for i in range(input.shape[2]):
             temp = input[:,:,i].t()
             temp = torch.fft.ifft(temp).t()

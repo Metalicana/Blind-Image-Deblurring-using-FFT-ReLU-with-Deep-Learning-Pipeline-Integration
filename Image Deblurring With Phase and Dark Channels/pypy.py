@@ -362,4 +362,3 @@ tensor_kernel = torch.tensor(kernel_np)
 from L0Restoration import L0Restoration
 
 S = L0Restoration(mat.unsqueeze(2), tensor_kernel, .1415, 2.0)
-# print(S.squeeze())
