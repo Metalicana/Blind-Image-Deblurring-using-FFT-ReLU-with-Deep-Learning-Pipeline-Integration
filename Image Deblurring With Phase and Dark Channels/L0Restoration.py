@@ -15,7 +15,7 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
     #THIS COMMENT IS ONLY FOR TESTING PUT IT BACK TO HOW IT WAS
     Im = wrap_boundary_liu(Im, opt_fft_size([H + kernel.shape[0] - 1, W + kernel.shape[1] - 1 ]))
     # print('im here')
-    print(Im.squeeze().shape)
+    # print(Im.squeeze()[0:5,0:5])
     # Initialize S
     S = Im.clone()
     # print(S.shape)

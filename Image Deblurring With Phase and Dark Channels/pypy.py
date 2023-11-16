@@ -353,15 +353,17 @@ mat /= (120*120)
 
 kernel_np = np.eye(7, dtype=np.float32)
 
+from misc import conv2
+
 
 
 # Convert the NumPy array to a PyTorch tensor
 tensor_kernel = torch.tensor(kernel_np)
+print(conv2(mat.unsqueeze(2), tensor_kernel, 'valid').squeeze())
 
+# from L0Restoration import L0Restoration
 
-from L0Restoration import L0Restoration
-
-S = L0Restoration(mat.unsqueeze(2), tensor_kernel, .1415, 2.0)
+# S = L0Restoration(mat.unsqueeze(2), tensor_kernel, .1415, 2.0)
 
 #Testing Estimate PSF
 # blurred_x = torch.arange(1,120*120 + 1).reshape(120,120).type(torch.float32)
