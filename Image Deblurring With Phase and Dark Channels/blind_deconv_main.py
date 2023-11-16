@@ -66,7 +66,7 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
         k_prev = k.clone()
         
         # Estimate PSF (kernel)
-        
+        #k.size() is list ?
         k = estimate_psf(Bx, By, latent_x, latent_y, 2, k_prev.size())
         
         # Prune isolated noise in the kernel

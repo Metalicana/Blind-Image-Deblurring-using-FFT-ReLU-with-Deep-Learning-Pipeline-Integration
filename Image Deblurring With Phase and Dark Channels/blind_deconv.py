@@ -52,7 +52,7 @@ def blind_deconv(y, lambda_dark, lambda_grad, opts):
         # print(f'Ks klooked like this ')
         ks, lambda_dark, lambda_grad, interim_latent = blind_deconv_main(ys.unsqueeze(2), ks, lambda_dark, lambda_grad, threshold, opts)
         #remember to fix this later on 
-        
+        print(ks)
         # ks = adjust_psf_center(ks)
         ks[ks < 0] = 0
         sumk = ks.sum()
