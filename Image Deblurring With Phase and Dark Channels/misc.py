@@ -41,7 +41,7 @@ def conv2(A, B, shape):
     #Expect A and B to be 2 dimensional matrieces
     #if shape is full then return full
     if A.dim() == 2:
-        print(f'and finally A = {A.shape} B = {B.shape}')
+        # print(f'and finally A = {A.shape} B = {B.shape}')
         padCol = int((B.shape[1]*2 - 2)/2)
         padRow = int((B.shape[0]*2 - 2)/2)
         cropX, cropY = (A.shape[0]-B.shape[0]+1, A.shape[1]-B.shape[1]+1)
@@ -50,7 +50,7 @@ def conv2(A, B, shape):
         A = F.pad(A,padding, value=0)
         
         B = torch.flip(B,[0,1])
-        print(f'Before disaster : A = {A.shape} B = {B.shape}')
+        # print(f'Before disaster : A = {A.shape} B = {B.shape}')
         res = F.conv2d(A.unsqueeze(0).unsqueeze(0),B.unsqueeze(0).unsqueeze(0))
         res = res.squeeze() 
         if shape=='full':

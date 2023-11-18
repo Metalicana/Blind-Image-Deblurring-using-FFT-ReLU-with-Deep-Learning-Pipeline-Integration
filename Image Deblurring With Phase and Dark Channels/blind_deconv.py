@@ -48,11 +48,11 @@ def blind_deconv(y, lambda_dark, lambda_grad, opts):
         
         if s == num_scales:
             _, _, threshold = threshold_pxpy_v1(ys, torch.tensor(max(k1, k2)) )
-        print(f'shape of input before going into blind_deconv_main {ys.unsqueeze(2).shape}')
+        # print(f'shape of input before going into blind_deconv_main {ys.unsqueeze(2).shape}')
         # print(f'Ks klooked like this ')
         ks, lambda_dark, lambda_grad, interim_latent = blind_deconv_main(ys.unsqueeze(2), ks, lambda_dark, lambda_grad, threshold, opts)
         #remember to fix this later on 
-        print(ks)
+        # print(ks)
         # ks = adjust_psf_center(ks)
         ks[ks < 0] = 0
         sumk = ks.sum()
@@ -92,7 +92,7 @@ def downsample_image(I, ret):
     sf = sf.unsqueeze(0)
 
     h,w = I.shape
-    print(I[:,434:449])
+    # print(I[:,434:449])
     I = conv2Vector(sf,sf,I,'valid')
     # print(I)
     gy, gx = torch.meshgrid(torch.arange(1, I.shape[0] + 1, step=1 / ret), torch.arange(1, I.shape[1] + 1, step=1 / ret))
@@ -113,7 +113,7 @@ def downsample_image(I, ret):
    
     sI = F.grid_sample(I, grid, mode='bilinear', padding_mode='border', align_corners=False)
 
-    print(f'SI is {sI}')
+    # print(f'SI is {sI}')
     return sI.squeeze()
 
 def resize_kernel(k, ret, k1, k2):

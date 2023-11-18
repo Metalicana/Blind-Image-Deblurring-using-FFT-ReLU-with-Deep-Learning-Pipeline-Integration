@@ -324,42 +324,42 @@ z = otf2psf(y,[1,2])
 # print(properties)
 
 #Image to tensor
-# import cv2
-# from PIL import Image
-# import torchvision.transforms as transforms
+import cv2
+from PIL import Image
+import torchvision.transforms as transforms
 
-# image_path = 'images/post_blur.png'
-# ipt = Image.open(image_path)
+image_path = 'images/post_blur.png'
+ipt = Image.open(image_path)
 
-# def process_image(input_image) -> torch.Tensor:
-#   transform = transforms.Compose([
-#       transforms.PILToTensor()
-#   ])
-#   input_tensor = transform(input_image).type(torch.float32)
-#   return input_tensor
-
-
-# image = process_image(ipt)
-# image = image.permute(1,2,0)
-
-# true_gray = image[:,:,0]*0.299+ image[:,:,1]*0.587 + image[:,:,2]*0.114
-# print(torch.round(true_gray))
-# true_gray = true_gray / 255.0
-# print(true_gray)
-import numpy as np
-mat = torch.arange(1,120*120 + 1).reshape(120,120).type(torch.float32)
-mat /= (120*120)
+def process_image(input_image) -> torch.Tensor:
+  transform = transforms.Compose([
+      transforms.PILToTensor()
+  ])
+  input_tensor = transform(input_image).type(torch.float32)
+  return input_tensor
 
 
-kernel_np = np.eye(7, dtype=np.float32)
+image = process_image(ipt)
+image = image.permute(1,2,0)
 
-from misc import conv2
+true_gray = image[:,:,0]*0.2989+ image[:,:,1]*0.587 + image[:,:,2]*0.114
+true_gray = torch.round(true_gray)
+true_gray = true_gray / 255.0
+print(true_gray[0:5,0:5])
+# import numpy as np
+# mat = torch.arange(1,120*120 + 1).reshape(120,120).type(torch.float32)
+# mat /= (120*120)
+
+
+# kernel_np = np.eye(7, dtype=np.float32)
+
+# from misc import conv2
 
 
 
-# Convert the NumPy array to a PyTorch tensor
-tensor_kernel = torch.tensor(kernel_np)
-print(conv2(mat.unsqueeze(2), tensor_kernel, 'valid').squeeze())
+# # Convert the NumPy array to a PyTorch tensor
+# tensor_kernel = torch.tensor(kernel_np)
+# print(conv2(mat.unsqueeze(2), tensor_kernel, 'valid').squeeze())
 
 # from L0Restoration import L0Restoration
 
@@ -385,3 +385,33 @@ print(conv2(mat.unsqueeze(2), tensor_kernel, 'valid').squeeze())
 # from estimate_psf import estimate_psf
 
 # print(estimate_psf(blurred_x, blurred_y, latent_x, latent_y, 2, [9,9]))
+# import numpy as np
+
+# opts = {
+#         'prescale': 1,   # Downsampling
+#         'xk_iter': 5,    # Iterations
+#         'gamma_correct': 1.0,
+#         'k_thresh': 20,
+#         'kernel_size':25,
+#     }
+
+# lambda_dark = 4e-3
+# #Experimenting with lambda_dark set to 0
+# lambda_dark = 0
+# lambda_grad = 4e-3
+# lambda_tv = 0.003
+# lambda_l0 = 5e-4
+# weight_ring = 1
+
+# threshold = 0.0086
+
+# kernel_np = np.eye(7, dtype=np.float32)
+# tensor_kernel = torch.tensor(kernel_np)
+
+# blurred_x = torch.arange(1,120*120 + 1).reshape(120,120).type(torch.float32)
+# blurred_x /= (120.0*120.0)
+# from blind_deconv_main import blind_deconv_main
+# from blind_deconv import blind_deconv
+# # k , lambda_dark, lambda_grad, S = blind_deconv_main(blurred_x.unsqueeze(2)  , tensor_kernel, lambda_dark,lambda_grad,threshold,opts)
+# kernel, interim = blind_deconv(blurred_x, lambda_dark, lambda_grad, opts)
+# print(kernel)

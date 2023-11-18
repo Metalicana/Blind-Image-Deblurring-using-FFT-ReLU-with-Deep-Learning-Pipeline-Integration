@@ -5,7 +5,6 @@ from dark_channel import dark_channel
 from assign_dark_channel_to_pixel import assign_dark_channel_to_pixel
 import cv2 as cv
 def L0Deblur_dark_channel(Im, kernel, lambda_, wei_grad, kappa=2.0):
-    
     S = Im.clone()
     betamax = 1e5
     fx = torch.tensor([1, -1])

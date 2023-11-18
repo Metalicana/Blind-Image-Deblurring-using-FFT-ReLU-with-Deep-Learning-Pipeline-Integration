@@ -10,6 +10,12 @@ from misc import visualize_image
 # Import your Python implementations of necessary functions here.
 
 # Define your blind_deconv function and other required functions here.
+def process_image(input_image) -> torch.Tensor:
+  transform = transforms.Compose([
+      transforms.PILToTensor()
+  ])
+  input_tensor = transform(input_image).type(torch.float32)
+  return input_tensor
 
 def main():
     # Specify your input image file path
@@ -44,11 +50,13 @@ def main():
         # Allow the user to select a specific area for deblurring (not implemented in this example)
         pass
     else:
-        yg = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-        yg = torch.from_numpy(yg).type(torch.float32)
-        mn = torch.min(yg)
-        mx = torch.max(yg)
+        inpt = Image.open(image_path)
+        image = process_image(inpt)
+        image = image.permute(1,2,0)
+        yg =  image[:,:,0]*0.2989+ image[:,:,1]*0.587 + image[:,:,2]*0.114
+        yg = torch.round(yg)
         yg = yg / 255.0
+        
     # Perform blind deconvolution
 
     kernel, interim_latent = blind_deconv(yg, lambda_dark, lambda_grad, opts)

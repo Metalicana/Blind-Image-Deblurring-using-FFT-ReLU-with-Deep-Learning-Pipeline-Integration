@@ -72,7 +72,7 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
         # Prune isolated noise in the kernel
         # print('printing kernel after L0Restoration and estimate PSF')
         # print(k)
-
+        print('pruning isolated noise in kernel...')
         CC = connected_components(k)
         for ii in range(1, CC['NumObjects'] + 1):
             idx = torch.tensor(CC['PixelIdxList'][ii-1])

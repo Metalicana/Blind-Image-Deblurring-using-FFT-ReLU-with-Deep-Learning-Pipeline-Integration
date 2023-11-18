@@ -50,7 +50,7 @@ def threshold_pxpy_v1(latent, psf_size, threshold=None):
                 break
 
     # Thresholding
-    print(threshold)
+    # print(threshold)
     m = pm < threshold
     while torch.all(m == 1):
         threshold = threshold * 0.81
