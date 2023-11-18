@@ -11,7 +11,7 @@ def blind_deconv(y, lambda_dark, lambda_grad, opts):
         y = y.pow(opts['gamma_correct'])
     
     b = torch.zeros(opts['kernel_size'])
-
+    
     ret = math.sqrt(0.5)
     maxitr = max(math.floor(math.log(5 / opts['kernel_size']) / math.log(ret)), 0)
     num_scales = maxitr + 1
@@ -32,25 +32,34 @@ def blind_deconv(y, lambda_dark, lambda_grad, opts):
     for s in range(num_scales, 0, -1):
         if s == num_scales:
             ks = init_kernel(k1list[s - 1]).to(torch.float32)
+            # print(ks)
             k1 = k1list[s - 1].to(torch.int)
             k2 = k1.to(torch.int)
+           
 
         else:
             k1 = k1list[s - 1].to(torch.int)
             k2 = k1.to(torch.int)
+            
             ks = resize_kernel(ks, 1 / ret, k1list[s - 1], k2list[s - 1])
+            # print(ks)
+
 
         cret = retv[s - 1]
-
+        # print(y[0:5,0:5])
         ys = downsample_image(y, cret)
+        # print(ys[0:10,0:10])
         # ys = ys.permute(1,2,0)
         print(f"Processing scale {s}/{num_scales}; kernel size {k1}x{k2}; image size {ys.shape[0]}x{ys.shape[1]}")
         
         if s == num_scales:
             _, _, threshold = threshold_pxpy_v1(ys, torch.tensor(max(k1, k2)) )
+        # print(threshold)
         # print(f'shape of input before going into blind_deconv_main {ys.unsqueeze(2).shape}')
         # print(f'Ks klooked like this ')
+        
         ks, lambda_dark, lambda_grad, interim_latent = blind_deconv_main(ys.unsqueeze(2), ks, lambda_dark, lambda_grad, threshold, opts)
+        # print(ks)
         #remember to fix this later on 
         # print(ks)
         # ks = adjust_psf_center(ks)
@@ -94,25 +103,32 @@ def downsample_image(I, ret):
     h,w = I.shape
     # print(I[:,434:449])
     I = conv2Vector(sf,sf,I,'valid')
-    # print(I)
-    gy, gx = torch.meshgrid(torch.arange(1, I.shape[0] + 1, step=1 / ret), torch.arange(1, I.shape[1] + 1, step=1 / ret))
+    # print(I[0:10,0:10])
+    gx, gy = torch.meshgrid(torch.arange(1, I.shape[0] + 1, step=1 / ret), torch.arange(1, I.shape[1] + 1, step=1 / ret))
     # print(gx)
   
     gx = gx.squeeze()
+    
     gxMax = gx.max()
     gxMin = gx.min()
     gx = (2*(gx-gxMin)/(gxMax-gxMin))-1
+    # print(gx[0:5,0:5])
     gy = gy.squeeze()
+    # print(gy[0:5,0:5])
     gyMax = gy.max()
     gyMin = gy.min()
     gy = (2*(gy-gyMin)/(gyMax-gyMin))-1
+    # return I
+    I = I.view(1,1,I.shape[0], I.shape[1])
     grid = torch.stack((gy, gx), dim=-1)
     grid = grid.unsqueeze(0)
-  
-    I = I.view(1,1,I.shape[0], I.shape[1])
-   
-    sI = F.grid_sample(I, grid, mode='bilinear', padding_mode='border', align_corners=False)
 
+    
+    #THIS NEEDS TO BE FIXED LATER ON
+    
+    sI = F.grid_sample(I, grid, mode='bilinear', padding_mode='border', align_corners=True)
+    # print(sI.squeeze()[0:10,0:10])
+    
     # print(f'SI is {sI}')
     return sI.squeeze()
 

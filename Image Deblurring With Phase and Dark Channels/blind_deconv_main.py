@@ -46,9 +46,11 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
 
     #THIS COMMENTED LINE IS ABSOLUTELY CRUCIAL 
     blur_B_w = wrap_boundary_liu(blur_B, opt_fft_size( [H + k.shape[0]-1, W + k.shape[0]-1 ] ))
+    # print(blur_B_w[0:10,0:10].squeeze())
     blur_B_tmp = blur_B[0:H,0:W,:]
     Bx = conv2(blur_B_tmp, dx, 'valid')
     By = conv2(blur_B_tmp, dy, 'valid')
+    # print(Bx[0:10,0:10])
     # Bx = F.conv2d(blur_B_w.permute(2, 0, 1).unsqueeze(0), dx.unsqueeze(0).unsqueeze(0)).squeeze(0).permute(1, 2, 0)
     # By = F.conv2d(blur_B_w.permute(2, 0, 1).unsqueeze(0), dy.unsqueeze(0).unsqueeze(0)).squeeze(0).permute(1, 2, 0)
     
@@ -58,7 +60,10 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
             S = S[0:H, 0:W, :]
         else:
             # print(f'before L0 restoration S shape {blur_B.shape}')
+            # print(blur_B[0:10,0:10].squeeze())
+            # print(k)
             S = L0Restoration(blur_B, k, lambda_grad, 2.0)
+            # print(S[0:10,0:10].squeeze())
             # print(f'After L0 restoration S shape {S.shape}')
         
         latent_x, latent_y, threshold = threshold_pxpy_v1(S, max(k.size()), threshold)
@@ -67,12 +72,14 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
         
         # Estimate PSF (kernel)
         #k.size() is list ?
+        # print(k)
         k = estimate_psf(Bx, By, latent_x, latent_y, 2, k_prev.size())
         
         # Prune isolated noise in the kernel
         # print('printing kernel after L0Restoration and estimate PSF')
         # print(k)
         print('pruning isolated noise in kernel...')
+        # print(k)
         CC = connected_components(k)
         for ii in range(1, CC['NumObjects'] + 1):
             idx = torch.tensor(CC['PixelIdxList'][ii-1])

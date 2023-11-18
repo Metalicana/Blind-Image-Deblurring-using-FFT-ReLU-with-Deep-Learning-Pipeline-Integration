@@ -56,7 +56,7 @@ def main():
         yg =  image[:,:,0]*0.2989+ image[:,:,1]*0.587 + image[:,:,2]*0.114
         yg = torch.round(yg)
         yg = yg / 255.0
-        
+        # print(yg[0:5,0:5])
     # Perform blind deconvolution
 
     kernel, interim_latent = blind_deconv(yg, lambda_dark, lambda_grad, opts)
