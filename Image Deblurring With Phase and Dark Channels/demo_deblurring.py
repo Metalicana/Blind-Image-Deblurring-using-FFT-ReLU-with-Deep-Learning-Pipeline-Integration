@@ -6,7 +6,7 @@ import cv2
 import os
 from blind_deconv import blind_deconv
 from ringing_artifacts_removal import ringing_artifacts_removal
-from misc import visualize_image, gray_image
+from misc import visualize_image, gray_image, process_image
 # Import your Python implementations of necessary functions here.
 
 # Define your blind_deconv function and other required functions here.
@@ -50,7 +50,7 @@ def main():
 
         # print(yg[0:5,0:5])
     # Perform blind deconvolution
-
+    
     kernel, interim_latent = blind_deconv(yg, lambda_dark, lambda_grad, opts)
     plt.figure(figsize=(12, 6))
     plt.imshow(kernel, cmap='gray')
@@ -60,7 +60,10 @@ def main():
     saturation = 0  # Set this to 1 if the image is saturated
     if not saturation:
         # Apply TV-L2 denoising method
-        Latent = ringing_artifacts_removal(yg, kernel, lambda_tv, lambda_l0, weight_ring)
+        y = process_image(Image.open(image_path))
+        y = y.permute(1,2,0)
+        print(y.shape)
+        Latent = ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring)
     else:
         # Apply Whyte's deconvolution method
         # Latent = whyte_deconv(yg, kernel)
