@@ -6,6 +6,13 @@ from scipy.sparse.linalg import cg
 from misc import psf2otf, otf2psf, fft2, ifft2
 from cho_code.conjgrad import conjgrad
 def estimate_psf(blurred_x, blurred_y, latent_x, latent_y, weight, psf_size):
+    
+    
+    # import numpy as np
+    # nparr = latent_x.squeeze().numpy()
+    # np.savetxt('output.txt', nparr)
+    # from misc import visualize_image
+    # visualize_image(latent_x.squeeze())
     latent_xf = fft2(latent_x)
     latent_yf = fft2(latent_y)
     blurred_xf = fft2(blurred_x)

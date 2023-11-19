@@ -1,7 +1,6 @@
 import torch
 import torch.nn.functional as F
-from cho_code import threshold_pxpy_v1
-import estimate_psf
+
 from L0Restoration import L0Restoration
 from scipy.ndimage import label
 from cho_code.wrap_boundary_liu import wrap_boundary_liu
@@ -62,17 +61,21 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
             # print(f'before L0 restoration S shape {blur_B.shape}')
             # print(blur_B[0:10,0:10].squeeze())
             # print(k)
+            # print(lambda_grad)
             S = L0Restoration(blur_B, k, lambda_grad, 2.0)
+            # from misc import visualize_image
+            # visualize_image(S.squeeze())
+
             # print(S[0:10,0:10].squeeze())
             # print(f'After L0 restoration S shape {S.shape}')
         
         latent_x, latent_y, threshold = threshold_pxpy_v1(S, max(k.size()), threshold)
-        
         k_prev = k.clone()
         
         # Estimate PSF (kernel)
         #k.size() is list ?
         # print(k)
+        # print(k_prev.size())
         k = estimate_psf(Bx, By, latent_x, latent_y, 2, k_prev.size())
         
         # Prune isolated noise in the kernel

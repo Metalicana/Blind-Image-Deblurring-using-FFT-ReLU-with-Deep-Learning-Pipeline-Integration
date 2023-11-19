@@ -19,6 +19,7 @@ def threshold_pxpy_v1(latent, psf_size, threshold=None):
     dy = torch.tensor([[-1, 0], [1, 0]], dtype=torch.float)
 
     # Compute gradients
+    
     px = conv2(denoised, dx, 'valid')
     py = conv2(denoised, dy, 'valid')
     pm = px**2 + py**2
