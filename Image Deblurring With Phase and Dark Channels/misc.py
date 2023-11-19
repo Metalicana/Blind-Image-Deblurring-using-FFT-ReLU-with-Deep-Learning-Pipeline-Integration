@@ -24,7 +24,7 @@ def visualize_image(input_tensor):
     plt.colorbar()
     plt.show()
 def visualize_rgb(input_tensor):
-    plt.imshow(input_tensor.permute(1,2,0))
+    plt.imshow(input_tensor)
     plt.title("Image")
     plt.colorbar()
     plt.show()

@@ -30,11 +30,11 @@ def ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring):
     
     Latent_l0 = L0Restoration(y_pad, kernel, lambda_l0, 2)
     Latent_l0 = Latent_l0[:H, :W, :]
-    
+    # print(Latent_l0.shape)
     diff = Latent_tv - Latent_l0
     bf_diff = bilateral_filter(diff, 3, 0.1)
     result = Latent_tv - weight_ring * bf_diff
-    
+    # print(result.shape)
     return result
 
 # Usage

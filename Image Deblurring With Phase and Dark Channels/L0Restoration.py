@@ -43,8 +43,11 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
         Denormin2 = Denormin2.unsqueeze(dim=2).expand(-1, -1, D)
         KER = KER.unsqueeze(dim=2).expand(-1, -1, D)
         Den_KER = Den_KER.unsqueeze(dim=2).expand(-1, -1, D)
+        Normin1 = torch.conj(KER) * fft2(S)
+    else:
+        
     # print(f'Kernel dims {KER.shape}, S shape {S.shape}')
-    Normin1 = torch.conj(KER).unsqueeze(-1).expand_as(S) * fft2(S)
+        Normin1 = torch.conj(KER).unsqueeze(-1).expand_as(S) * fft2(S)
     # print(fft2(S).squeeze())
     beta = 2 * lambda_
     while beta < betamax:
@@ -82,8 +85,10 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
         v2 = -torch.diff(v,dim=0)
         v1 = v1.unsqueeze(0)
         Normin2 += torch.cat((v1,v2))
-        
-        FS = (Normin1 + beta * fft2(Normin2)) / Denormin.unsqueeze(-1).expand_as(Normin1)
+        if D == 1:
+            FS = (Normin1 + beta * fft2(Normin2)) / Denormin.unsqueeze(-1).expand_as(Normin1)
+        else:
+            FS = (Normin1 + beta * fft2(Normin2)) / Denormin
         S = ifft2(FS).real
        
         beta *= kappa

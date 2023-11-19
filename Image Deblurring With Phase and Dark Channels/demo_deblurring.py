@@ -6,7 +6,7 @@ import cv2
 import os
 from blind_deconv import blind_deconv
 from ringing_artifacts_removal import ringing_artifacts_removal
-from misc import visualize_image, gray_image, process_image
+from misc import visualize_rgb ,visualize_image, gray_image, process_image
 # Import your Python implementations of necessary functions here.
 
 # Define your blind_deconv function and other required functions here.
@@ -68,27 +68,28 @@ def main():
         # Apply Whyte's deconvolution method
         # Latent = whyte_deconv(yg, kernel)
         pass
-
+    # print(Latent.shape)
+    visualize_rgb(Latent)
     # Display the results
-    plt.figure(figsize=(12, 6))
-    plt.subplot(131)
-    plt.imshow(kernel, cmap='gray')
-    plt.title('Estimated Kernel')
-    plt.subplot(132)
-    plt.imshow(interim_latent, cmap='gray')
-    plt.title('Interim Latent Image')
-    plt.subplot(133)
-    plt.imshow(Latent, cmap='gray')
-    plt.title('Deblurred Image')
+    # plt.figure(figsize=(12, 6))
+    # plt.subplot(131)
+    # plt.imshow(kernel, cmap='gray')
+    # plt.title('Estimated Kernel')
+    # plt.subplot(132)
+    # plt.imshow(interim_latent, cmap='gray')
+    # plt.title('Interim Latent Image')
+    # plt.subplot(133)
+    # plt.imshow(Latent, cmap='gray')
+    # plt.title('Deblurred Image')
 
-    # Save the results
-    kernel_image = Image.fromarray((kernel * 255).astype('uint8'))
-    latent_image = Image.fromarray((Latent * 255).astype('uint8'))
-    interim_image = Image.fromarray((interim_latent * 255).astype('uint8'))
+    # # Save the results
+    # kernel_image = Image.fromarray((kernel * 255).astype('uint8'))
+    # latent_image = Image.fromarray((Latent * 255).astype('uint8'))
+    # interim_image = Image.fromarray((interim_latent * 255).astype('uint8'))
 
-    kernel_image.save(os.path.join(results_dir, 'kernel.png'))
-    latent_image.save(os.path.join(results_dir, 'result.png'))
-    interim_image.save(os.path.join(results_dir, 'interim_result.png'))
+    # kernel_image.save(os.path.join(results_dir, 'kernel.png'))
+    # latent_image.save(os.path.join(results_dir, 'result.png'))
+    # interim_image.save(os.path.join(results_dir, 'interim_result.png'))
 
 if __name__ == "__main__":
     main()

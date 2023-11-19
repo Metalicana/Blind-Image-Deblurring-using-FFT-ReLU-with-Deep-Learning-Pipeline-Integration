@@ -74,13 +74,13 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
         
         # Estimate PSF (kernel)
         #k.size() is list ?
-        print(k)
+        # print(k)
         # print(k_prev.size())
         k = estimate_psf(Bx, By, latent_x, latent_y, 2, k_prev.size())
         
         # Prune isolated noise in the kernel
         # print('printing kernel after L0Restoration and estimate PSF')
-        print(k)
+        # print(k)
         print('pruning isolated noise in kernel...')
         # print(k)
         CC = connected_components(k)
