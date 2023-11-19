@@ -2,6 +2,22 @@ import torch
 import torch.fft as fft
 import torch.nn.functional as F
 from matplotlib import pyplot as plt
+import torchvision.transforms as transforms
+def gray_image(inpt):
+    image = process_image(inpt)
+    image = image.permute(1,2,0)
+    yg =  image[:,:,0]*0.2989+ image[:,:,1]*0.587 + image[:,:,2]*0.114
+    yg = torch.round(yg)
+    yg = yg / 255.0
+    return yg
+
+def process_image(input_image) -> torch.Tensor:
+  transform = transforms.Compose([
+      transforms.PILToTensor()
+  ])
+  input_tensor = transform(input_image).type(torch.float32)
+  return input_tensor
+
 def visualize_image(input_tensor):
     plt.imshow(input_tensor ,cmap='gray')
     plt.title("Image")

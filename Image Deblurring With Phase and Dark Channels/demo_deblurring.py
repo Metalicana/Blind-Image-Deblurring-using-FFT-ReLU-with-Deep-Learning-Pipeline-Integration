@@ -6,16 +6,11 @@ import cv2
 import os
 from blind_deconv import blind_deconv
 from ringing_artifacts_removal import ringing_artifacts_removal
-from misc import visualize_image
+from misc import visualize_image, gray_image
 # Import your Python implementations of necessary functions here.
 
 # Define your blind_deconv function and other required functions here.
-def process_image(input_image) -> torch.Tensor:
-  transform = transforms.Compose([
-      transforms.PILToTensor()
-  ])
-  input_tensor = transform(input_image).type(torch.float32)
-  return input_tensor
+
 
 def main():
     # Specify your input image file path
@@ -51,11 +46,8 @@ def main():
         pass
     else:
         inpt = Image.open(image_path)
-        image = process_image(inpt)
-        image = image.permute(1,2,0)
-        yg =  image[:,:,0]*0.2989+ image[:,:,1]*0.587 + image[:,:,2]*0.114
-        yg = torch.round(yg)
-        yg = yg / 255.0
+        yg = gray_image(inpt)
+
         # print(yg[0:5,0:5])
     # Perform blind deconvolution
 
