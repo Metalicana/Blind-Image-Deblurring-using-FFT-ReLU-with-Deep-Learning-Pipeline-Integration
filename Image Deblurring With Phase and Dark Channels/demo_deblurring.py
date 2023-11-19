@@ -62,13 +62,15 @@ def main():
         # Apply TV-L2 denoising method
         y = process_image(Image.open(image_path))
         y = y.permute(1,2,0)
-        print(y.shape)
+        # print(y.shape)
         Latent = ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring)
     else:
         # Apply Whyte's deconvolution method
         # Latent = whyte_deconv(yg, kernel)
         pass
     # print(Latent.shape)
+   
+    Latent = Latent/255.0
     visualize_rgb(Latent)
     # Display the results
     # plt.figure(figsize=(12, 6))

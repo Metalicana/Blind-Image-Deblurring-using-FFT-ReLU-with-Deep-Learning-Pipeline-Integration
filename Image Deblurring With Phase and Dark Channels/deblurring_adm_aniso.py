@@ -1,7 +1,7 @@
 import torch
 
 from misc import psf2otf, fft, fft2, ifft2
-
+import math
 def sign(n):
     if n==0: return n
     else: return n/abs(n)
@@ -38,8 +38,8 @@ def row_col_diff_pair(data):
 
 
 def deblurring_adm_aniso(B, k, lambda_val, alpha):
-    beta = 1 / lambda_val
-    beta_rate = 2 * 2**0.5
+    beta = 1.0 / lambda_val
+    beta_rate = 2.0 * math.sqrt(2.0)
     beta_min = 0.001
 
     m, n = B.shape

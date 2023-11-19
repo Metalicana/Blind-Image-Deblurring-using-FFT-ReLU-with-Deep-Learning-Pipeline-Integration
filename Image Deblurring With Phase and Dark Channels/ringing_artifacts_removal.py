@@ -7,6 +7,7 @@ from bilateral_filter import bilateral_filter
 from deblurring_adm_aniso import deblurring_adm_aniso
 from L0Restoration import L0Restoration
 def ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring):
+    print(kernel)
     H, W, C = y.shape
     dim_list = [H, W]
     param = [x + y - 1 for x, y in zip(dim_list, list(kernel.shape))]
@@ -20,9 +21,9 @@ def ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring):
         n = aniso.ndim
         aniso = aniso.unsqueeze(n)
         Latent_tv = torch.cat((Latent_tv,aniso),dim = n)
-    print("TV")
-    print(Latent_tv.shape)
-    print(Latent_tv)
+    # print("TV")
+    # print(Latent_tv.shape)
+    # print(Latent_tv)
     Latent_tv = Latent_tv[:H, :W, :]
     
     if weight_ring == 0:
