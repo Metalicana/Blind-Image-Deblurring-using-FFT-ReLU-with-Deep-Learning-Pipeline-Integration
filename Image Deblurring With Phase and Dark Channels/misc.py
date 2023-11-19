@@ -81,8 +81,9 @@ def conv2(A, B, shape):
         padRow = int((B.shape[0]*2 - 2)/2)
         padding = (padCol, padCol, padRow, padRow)
         cropX, cropY = (A[:,:,0].shape[0]-B.shape[0]+1, A[:,:,0].shape[1]-B.shape[1]+1)
+
         B = torch.flip(B,[0,1])
-        res = torch.zeros((int(A.shape[0] + B.shape[0]- 1), int(A.shape[1] + B.shape[1] - 1), A.shape[2]))
+        res = torch.zeros((int(A.shape[0] + B.shape[0]- 1), int(A.shape[1] + B.shape[1] - 1), A.shape[2])).type(torch.float32)
         for i in range(A.shape[2]):
             temp = F.pad(A[:,:,i], padding, value=0)
             res[:,:,i] = F.conv2d(temp.unsqueeze(0).unsqueeze(0),B.unsqueeze(0).unsqueeze(0))
@@ -203,7 +204,7 @@ def otf2psf(input, sz):
         raise ValueError("Please use list for size parameter.")
     # if len(sz)!=2:
     #     raise ValueError("Please use list of length 2 for size parameter.")
-    input = input.to(torch.float32)
+    # input = input.to(torch.float32)
     input = ifft2(input)
     shiftRight, shiftBottom = int((input.shape[1]+2)/2) , int((input.shape[0]+2)/2)
     centerX, centerY = shiftBottom, shiftRight

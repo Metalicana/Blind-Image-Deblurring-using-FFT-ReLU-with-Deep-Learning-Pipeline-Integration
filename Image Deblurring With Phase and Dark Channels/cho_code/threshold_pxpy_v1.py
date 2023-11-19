@@ -23,7 +23,7 @@ def threshold_pxpy_v1(latent, psf_size, threshold=None):
     px = conv2(denoised, dx, 'valid')
     py = conv2(denoised, dy, 'valid')
     pm = px**2 + py**2
-
+    # print(pm[0:10,0:10].squeeze())
     # Estimate threshold if necessary
     if b_estimate_threshold:
         pd = torch.atan(py/ px)

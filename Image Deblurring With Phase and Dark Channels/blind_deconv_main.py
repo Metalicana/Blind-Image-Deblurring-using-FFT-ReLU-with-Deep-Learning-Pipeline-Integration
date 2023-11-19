@@ -49,7 +49,7 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
     blur_B_tmp = blur_B[0:H,0:W,:]
     Bx = conv2(blur_B_tmp, dx, 'valid')
     By = conv2(blur_B_tmp, dy, 'valid')
-    # print(Bx[0:10,0:10])
+    # print(Bx[0:10,0:10].squeeze())
     # Bx = F.conv2d(blur_B_w.permute(2, 0, 1).unsqueeze(0), dx.unsqueeze(0).unsqueeze(0)).squeeze(0).permute(1, 2, 0)
     # By = F.conv2d(blur_B_w.permute(2, 0, 1).unsqueeze(0), dy.unsqueeze(0).unsqueeze(0)).squeeze(0).permute(1, 2, 0)
     
@@ -74,13 +74,13 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
         
         # Estimate PSF (kernel)
         #k.size() is list ?
-        # print(k)
+        print(k)
         # print(k_prev.size())
         k = estimate_psf(Bx, By, latent_x, latent_y, 2, k_prev.size())
         
         # Prune isolated noise in the kernel
         # print('printing kernel after L0Restoration and estimate PSF')
-        # print(k)
+        print(k)
         print('pruning isolated noise in kernel...')
         # print(k)
         CC = connected_components(k)
