@@ -14,7 +14,7 @@ from misc import visualize_rgb ,visualize_image, gray_image, process_image
 
 def main():
     # Specify your input image file path
-    image_path = 'images/post_blur.png'
+    image_path = 'images/plate.png'
 
     # Create the results directory if it doesn't exist
     results_dir = 'results'
