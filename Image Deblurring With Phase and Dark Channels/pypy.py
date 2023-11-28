@@ -415,4 +415,41 @@ z = otf2psf(y,[1,2])
 # # k , lambda_dark, lambda_grad, S = blind_deconv_main(blurred_x.unsqueeze(2)  , tensor_kernel, lambda_dark,lambda_grad,threshold,opts)
 # kernel, interim = blind_deconv(blurred_x, lambda_dark, lambda_grad, opts)
 # print(kernel)
+image_path = 'images/blur1_0.png'
+from misc import gray_image,visualize_image
+from PIL import Image
+from fft_relu import fft_relu
 
+def findM(I):
+    Ic = I.clone().detach()
+    Ic = Ic.squeeze()
+    X = fft_relu(Ic)
+    
+    # Create L without gradient tracking
+    with torch.no_grad():
+        L = torch.zeros(X.shape[0], X.shape[0])
+
+    # Define the optimization criterion (e.g., Frobenius norm)
+    criterion = torch.nn.MSELoss()
+
+    # Set up an optimizer
+    optimizer = torch.optim.SGD([L.requires_grad_()], lr=0.1)
+
+    num_steps = 100
+
+    for step in range(num_steps):
+        optimizer.zero_grad()
+        predicted_X = torch.matmul(L, Ic)
+        loss = criterion(predicted_X, X)
+        loss.backward()
+
+        optimizer.step()
+
+        if step % 100 == 0:
+            print(f"Step [{step+1}/{num_steps}], Loss: {loss.item()}")
+
+    # Return the result without gradients
+    with torch.no_grad():
+        result = torch.matmul(L, Ic).unsqueeze(dim=2)
+
+    return result

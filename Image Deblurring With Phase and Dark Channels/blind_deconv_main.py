@@ -19,7 +19,7 @@ from skimage import measure
 def connected_components(bw):
     CC = {}
     t = bw.clone()
-    t = t.numpy()
+    t = t.detach().numpy()
     t[t>0] = 1
     lbl = measure.label(t)
     lbl = torch.from_numpy(lbl)
