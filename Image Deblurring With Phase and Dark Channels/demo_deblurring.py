@@ -52,6 +52,7 @@ def main():
     # Perform blind deconvolution
     
     kernel, interim_latent = blind_deconv(yg, lambda_dark, lambda_grad, opts)
+    
     plt.figure(figsize=(12, 6))
     plt.imshow(kernel, cmap='gray')
     plt.title('Estimated Kernel')
