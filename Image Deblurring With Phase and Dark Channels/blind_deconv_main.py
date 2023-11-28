@@ -1,7 +1,6 @@
 import torch
 import torch.nn.functional as F
-
-from L0Restoration import L0Restoration
+from L0RestorationBackup import L0RestorationBackup
 from scipy.ndimage import label
 from cho_code.wrap_boundary_liu import wrap_boundary_liu
 from cho_code.threshold_pxpy_v1 import threshold_pxpy_v1
@@ -62,7 +61,7 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
             # print(blur_B[0:10,0:10].squeeze())
             # print(k)
             # print(lambda_grad)
-            S = L0Restoration(blur_B, k, lambda_grad, 2.0)
+            S = L0RestorationBackup(blur_B, k, lambda_grad, 2.0)
             # from misc import visualize_image
             # visualize_image(S.squeeze())
 

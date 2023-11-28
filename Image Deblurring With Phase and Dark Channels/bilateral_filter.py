@@ -16,7 +16,7 @@ def bilateral_filter(img, sigma_s, sigma, boundary_method='replicate', s_size=No
 
     if d == 3:
         lab = img.clone()
-        lab = lab.numpy()
+        lab = lab.detach().numpy()
         lab = lab.astype(np.float32)
         lab = cv2.cvtColor(lab, cv2.COLOR_RGB2LAB)
         lab = torch.from_numpy(lab)
