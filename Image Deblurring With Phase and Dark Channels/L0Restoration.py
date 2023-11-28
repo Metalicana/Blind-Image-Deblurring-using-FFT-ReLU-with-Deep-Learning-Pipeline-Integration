@@ -51,8 +51,8 @@ def L0Restoration(Im, kernel, lambda_, kappa=2.0):
     # print(f'Kernel dims {KER.shape}, S shape {S.shape}')
         Normin1 = torch.conj(KER).unsqueeze(-1).expand_as(S) * fft2(S)
     # print(fft2(S).squeeze())
-    mybeta_pixel = 1
-    maxbeta_pixel = 8
+    mybeta_pixel = .125
+    maxbeta_pixel = 1
     while mybeta_pixel < maxbeta_pixel:
         
         #Estimate M
