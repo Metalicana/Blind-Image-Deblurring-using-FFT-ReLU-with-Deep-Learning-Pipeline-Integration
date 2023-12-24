@@ -66,8 +66,13 @@ def L0RestorationBackup(Im, kernel, lambda_, kappa=2.0):
             
             if t.ndim!=3 and t.shape[t.ndim-1]!=D:
                 t = t.unsqueeze(dim=2).expand(-1, -1, D)
-        J = M.clone()
+        J = M.clone().detach()
+        MT = J.clone().detach()
+         
         J[t]  = 0
+        
+        MT = MT.t()*J
+        
         beta = 2 * 0.004
         while beta < betamax:
             Denormin = Den_KER + beta * Denormin2 + mybeta_pixel
