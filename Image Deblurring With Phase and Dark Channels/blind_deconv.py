@@ -62,7 +62,7 @@ def blind_deconv(y, lambda_dark, lambda_grad, opts):
         # print(ks)
         #remember to fix this later on 
         # print(ks)
-        # ks = adjust_psf_center(ks)
+        ks = adjust_psf_center(ks)
         ks[ks < 0] = 0
         sumk = ks.sum()
         ks /= sumk
@@ -124,7 +124,6 @@ def downsample_image(I, ret):
     grid = grid.unsqueeze(0)
 
     
-    #THIS NEEDS TO BE FIXED LATER ON
     
     sI = F.grid_sample(I, grid, mode='bilinear', padding_mode='border', align_corners=True)
     # print(sI.squeeze()[0:10,0:10])
