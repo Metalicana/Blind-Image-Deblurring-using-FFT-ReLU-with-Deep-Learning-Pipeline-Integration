@@ -123,7 +123,9 @@ def downsample_image(I, ret):
     grid = torch.stack((gy, gx), dim=-1)
     grid = grid.unsqueeze(0)
 
-    
+    # print('Grid format:')
+    # print(grid.shape)
+    # print(grid)
     
     sI = F.grid_sample(I, grid, mode='bilinear', padding_mode='border', align_corners=True)
     # print(sI.squeeze()[0:10,0:10])
