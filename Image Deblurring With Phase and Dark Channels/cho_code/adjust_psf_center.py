@@ -30,13 +30,13 @@ def warp_projective2(im, A):
     print(test)
     print('ok')
     x = x.squeeze()
-    # xmx = x.max()
-    # xmn = x.min()
-    # x = (2*(x-xmn)/(xmx-xmn))-1
+    xmx = x.max()
+    xmn = x.min()
+    x = (2*(x-xmn)/(xmx-xmn))-1
     y = y.squeeze()
-    # ymx = y.max()
-    # ymn = y.min()
-    # y = (2*(y-ymn)/(ymx-ymn))-1
+    ymx = y.max()
+    ymn = y.min()
+    y = (2*(y-ymn)/(ymx-ymn))-1
 
     # grid = torch.stack((y,x), dim=-1)
     # grid = grid.unsqueeze(0)
