@@ -29,6 +29,7 @@ def L0Deblur_dark_channel(Im, kernel, lambda_, wei_grad, kappa=2.0):
     # print(fft2(S).squeeze())
 
     dark_r = 35
+    #This has some numpy related issues 
     ret2,th2 = cv.threshold(S*S,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
     mybeta_pixel = lambda_ / ret2
     maxbeta_pixel = 2**3

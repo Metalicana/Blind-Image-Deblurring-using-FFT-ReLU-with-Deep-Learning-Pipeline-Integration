@@ -14,7 +14,7 @@ from misc import visualize_rgb ,visualize_image, gray_image, process_image
 
 def main():
     # Specify your input image file path
-    image_path = 'images/plate.png'
+    image_path = 'images/post_blur.png'
 
     # Create the results directory if it doesn't exist
     results_dir = 'results'
@@ -34,7 +34,7 @@ def main():
 
     lambda_dark = 4e-3
     #Experimenting with lambda_dark set to 0
-    lambda_dark = 0
+    lambda_dark = 4e-3
     lambda_grad = 4e-3
     lambda_tv = 0.003
     lambda_l0 = 5e-4
