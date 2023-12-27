@@ -438,3 +438,4 @@ print(newPsf)
 print(newPsf.shape)
 from cho_code.adjust_psf_center import adjust_psf_center
 newPsf = adjust_psf_center(newPsf)
+print(newPsf)
