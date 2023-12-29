@@ -3,6 +3,7 @@ import torch.fft as fft
 import torch.nn.functional as F
 from matplotlib import pyplot as plt
 import torchvision.transforms as transforms
+
 def gray_image(inpt):
     image = process_image(inpt)
     image = image.permute(1,2,0)
@@ -229,3 +230,56 @@ def custompad(tensor, pad):
     tensor2 = F.pad(tensor2, (pad, pad, pad, pad), mode = "replicate")
     tensor2 = tensor2.transpose(0,2)
     return tensor2
+
+def fft_relu(input_tensor):
+    fft_input_tensor = fft2(input_tensor)
+    real_part = torch.real(fft_input_tensor)
+    imag_part = torch.imag(fft_input_tensor)
+
+    # Apply ReLU separately to real and imaginary parts
+    real_part_relu = torch.relu(real_part)
+    imag_part_relu = torch.relu(imag_part)
+
+    # Combine real and imaginary parts back into a complex tensor
+    fft_tensor_relu = torch.complex(real_part_relu, imag_part_relu)
+    result = torch.real(ifft2(fft_tensor_relu)) - 0.5*input_tensor
+    # result = (result - result.min())/(result.max() -result.min())
+    return result
+def findM(I):
+    if(I.shape[2] == 1):
+        I = I.squeeze()
+    else:
+        I = I.mean(dim=2)
+    print(f'I shape is {I.shape}')
+    Ic = I.clone().detach()
+    Ic = Ic.squeeze()
+    X = fft_relu(Ic)
+    
+    # Create L without gradient tracking
+    with torch.no_grad():
+        L = torch.zeros(X.shape[0], X.shape[0])
+
+    # Define the optimization criterion (e.g., Frobenius norm)
+    criterion = torch.nn.MSELoss()
+
+    # Set up an optimizer
+    optimizer = torch.optim.SGD([L.requires_grad_()], lr=0.1)
+
+    num_steps = 100
+
+    for step in range(num_steps):
+        optimizer.zero_grad()
+        predicted_X = torch.matmul(L, Ic)
+        loss = criterion(predicted_X, X)
+        loss.backward()
+
+        optimizer.step()
+
+        if step % 100 == 0:
+            print(f"Step [{step+1}/{num_steps}], Loss: {loss.item()}")
+
+    # Return the result without gradients
+    with torch.no_grad():
+        result = torch.matmul(L, Ic)
+
+    return result
