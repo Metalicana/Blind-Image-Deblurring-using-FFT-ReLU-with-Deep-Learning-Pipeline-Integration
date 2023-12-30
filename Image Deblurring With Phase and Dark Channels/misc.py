@@ -250,14 +250,14 @@ def findM(I):
         I = I.squeeze()
     else:
         I = I.mean(dim=2)
-    print(f'I shape is {I.shape}')
+    # print(f'I shape is {I.shape}')
     Ic = I.clone().detach()
     Ic = Ic.squeeze()
     X = fft_relu(Ic)
     
     # Create L without gradient tracking
     with torch.no_grad():
-        L = torch.zeros(X.shape[0], X.shape[0])
+        L = torch.zeros(X.shape[0], X.shape[1])
 
     # Define the optimization criterion (e.g., Frobenius norm)
     criterion = torch.nn.MSELoss()
@@ -269,7 +269,7 @@ def findM(I):
 
     for step in range(num_steps):
         optimizer.zero_grad()
-        predicted_X = torch.matmul(L, Ic)
+        predicted_X = torch.mul(L, Ic)
         loss = criterion(predicted_X, X)
         loss.backward()
 
@@ -280,6 +280,6 @@ def findM(I):
 
     # Return the result without gradients
     with torch.no_grad():
-        result = torch.matmul(L, Ic)
+        result = torch.mul(L, Ic)
 
     return result

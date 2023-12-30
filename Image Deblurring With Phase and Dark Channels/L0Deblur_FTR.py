@@ -38,7 +38,7 @@ def L0Deblur_FTR(Im, kernel, lambda_, kappa=2.0):
     
     # Create Denormin2
     Denormin2 = torch.abs(otfFx)**2 + torch.abs(otfFy)**2
-    
+    # print(f'Denormin2 shape {Denormin2.shape}')
     if D > 1:
         Denormin2 = Denormin2.unsqueeze(dim=2).expand(-1, -1, D)
         KER = KER.unsqueeze(dim=2).expand(-1, -1, D)
@@ -48,33 +48,40 @@ def L0Deblur_FTR(Im, kernel, lambda_, kappa=2.0):
         
     # print(f'Kernel dims {KER.shape}, S shape {S.shape}')
         Normin1 = torch.conj(KER).unsqueeze(-1).expand_as(S) * fft2(S)
-    # print(fft2(S).squeeze())
+    # print(Normin1.shape)
     #Hyperparamters to TUNE
-    alpha = 1
-    alpha_max = 8
+    alpha = 0.004
+    alpha_max = 2
     mu = 0.004
     wei_grad = 0.004
     while alpha < alpha_max:
         ftr = findM(S)
         Mat = ftr.clone().detach()
-        print(Mat.shape)
+        # print(Mat.shape)
         if D == 1:
             t = ftr**2 < mu / alpha
         else:
             #t = u.norm(dim=2)**2 < lambda_ / mybeta_pixel
             t = torch.sum(ftr*ftr, dim=2) < mu/alpha
             t = t.unsqueeze(2).expand(-1, -1, D)
+        bottom = fft2(Mat)
+        bottom = torch.abs(bottom)**2
         if D == 3:
             ftr = ftr.view(t.shape[0],t.shape[1],t.shape[2])
             Mat = Mat.view(t.shape[0],t.shape[1],t.shape[2])
+        else:
+            ftr = ftr.unsqueeze(-1)
+            Mat = Mat.unsqueeze(-1)
         ftr[t] = 0
         
         
-        top = alpha * torch.abs(Mat)**2
-        bottom = alpha * torch.conj(Mat) * ftr
+        top = torch.conj(fft2(Mat))*fft2(ftr)
+        # print(f'top shape {top.shape}')
+        
+        # print(f'bottom shape {bottom.shape}')
         beta = 2 * wei_grad
         while beta < betamax:
-            Denormin = Den_KER + beta * Denormin2 + bottom
+            Denormin = Den_KER + beta * Denormin2 + alpha * bottom
 
             tmph = torch.diff(S,dim=1)
             tmpv = torch.diff(S,dim=0)
@@ -106,10 +113,11 @@ def L0Deblur_FTR(Im, kernel, lambda_, kappa=2.0):
             v2 = -torch.diff(v,dim=0)
             v1 = v1.unsqueeze(0)
             Normin2 += torch.cat((v1,v2))
+            # print(f'Normin2 shape {Normin2.shape}')
             if D == 1:
-                FS = (Normin1 + beta * fft2(Normin2) + top) / Denormin.unsqueeze(-1).expand_as(Normin1)
+                FS = (Normin1 + beta * fft2(Normin2) + alpha*top) / Denormin.unsqueeze(-1).expand_as(Normin1)
             else:
-                FS = (Normin1 + beta * fft2(Normin2) + top) / Denormin
+                FS = (Normin1 + beta * fft2(Normin2) + alpha*top) / Denormin
             S = ifft2(FS).real
             beta = beta * kappa
             if wei_grad == 0:

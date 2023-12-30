@@ -6,6 +6,7 @@ from cho_code.wrap_boundary_liu import wrap_boundary_liu
 from bilateral_filter import bilateral_filter
 from deblurring_adm_aniso import deblurring_adm_aniso
 from L0Restoration import L0Restoration
+from L0Deblur_FTR import L0Deblur_FTR
 def ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring):
     print(kernel)
     H, W, C = y.shape
