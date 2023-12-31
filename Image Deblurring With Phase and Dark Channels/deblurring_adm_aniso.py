@@ -14,7 +14,7 @@ def computeDenominator(y, k):
     Denom1 = torch.abs(otfk)**2
     filtx = torch.tensor([[1,-1]])
     filty = filtx.t()
-
+    # print(f'filtx is {filtx.shape}')
     Denom2 = torch.abs(psf2otf(filtx,list(y.size())))**2 + \
             torch.abs(psf2otf(filty,list(y.size())))**2
     return Nomin1, Denom1, Denom2
@@ -25,14 +25,25 @@ def row_col_diff_pair(data):
     if(len(dims)!=2):
         raise ValueError("Please use 2D data.")
     # Calculate row-wise differences (differences along columns)
-    row_diff = data[1:, :] - data[:-1, :]
-    row_diff = torch.cat([row_diff,(data[0]-data[len(data)-1]).view(1,-1)])
-
+    # row_diff = data[1:, :] - data[:-1, :]
+    row_diff = torch.diff(data, 1, 1)
+    # print(f'row_diff is {row_diff.shape}')
+    a = data[:,0]-data[:,-1]
+    a = a.view(a.shape[0],1)
+    # print(f'a is {a.shape}')
+    row_diff = torch.cat([row_diff,a],dim = 1)
+    # print(f'row_diff is {row_diff.shape}')
     # Calculate column-wise differences (differences along rows)
-    column_diff = data[:, 1:] - data[:, :-1]
-    first_last_column_diff = data[:, 0] - data[:, -1]
-    first_last_column_diff = first_last_column_diff.view(-1,1)
-    column_diff = torch.cat((column_diff,first_last_column_diff),dim = 1)
+    column_diff = torch.diff(data, 1, 0)
+    # print(f'column_diff is {column_diff.shape}')
+    a = data[0,:]-data[-1,:]
+    a = a.view(1,a.shape[0])
+    # print(f'a is {a.shape}')
+    
+    # first_last_column_diff = data[:, 0] - data[:, -1]
+    # first_last_column_diff = first_last_column_diff.view(-1,1)
+
+    column_diff = torch.cat((column_diff,a),dim = 0)
     # Print the row-wise and column-wise differences
     return row_diff, column_diff
 
@@ -54,7 +65,7 @@ def deblurring_adm_aniso(B, k, lambda_val, alpha):
     Ix, Iy = row_col_diff_pair(I)
     
     while beta > beta_min:
-        gamma = 1 / (2 * beta)
+        gamma = 1.0 / (2.0 * beta)
         Denom = Denom1 + gamma*Denom2
 
         if alpha == 1:
@@ -75,8 +86,11 @@ def deblurring_adm_aniso(B, k, lambda_val, alpha):
         # Wxx = [Wx(:,n) - Wx(:, 1), -diff(Wx,1,2)]; 
         # Wxx = Wxx + [Wy(m,:) - Wy(1, :); -diff(Wy,1,1)]; 
         a = Wx[:,-1]-Wx[:,0]
+        # print(f'a is {a.shape}')
         b = -torch.diff(Wx,1,1)
+        # print(f'b is {b.shape}')
         Wxx = torch.cat((a.view(a.shape[0],1),b), dim = 1)
+        # print(f'Wxx is {Wxx.shape}')
         #print("WXX")
         #print(Wxx)
         a = Wy[-1,:]-Wy[0,:]

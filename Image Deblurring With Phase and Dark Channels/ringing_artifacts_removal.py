@@ -14,8 +14,8 @@ def ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring):
     param = [x + y - 1 for x, y in zip(dim_list, list(kernel.shape))]
     p = opt_fft_size(param)
     y_pad = wrap_boundary_liu(y, p)
-
-    Latent_tv = torch.Tensor()
+    # print(f'y_pad shape is {y_pad.shape}')
+    Latent_tv = torch.Tensor().type(torch.float32)
     
     for c in range(C):
         aniso = deblurring_adm_aniso(y_pad[:, :, c], kernel, lambda_tv, 1)
