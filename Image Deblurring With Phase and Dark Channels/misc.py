@@ -17,7 +17,7 @@ def process_image(input_image) -> torch.Tensor:
       transforms.PILToTensor()
   ])
   input_tensor = transform(input_image).type(torch.float32)
-  input_tensor = input_tensor/255.0
+  
   return input_tensor
 
 def visualize_image(input_tensor):

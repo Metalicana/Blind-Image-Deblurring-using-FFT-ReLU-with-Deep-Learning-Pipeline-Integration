@@ -50,7 +50,7 @@ def L0Deblur_FTR(Im, kernel, lambda_, kappa=2.0):
         Normin1 = torch.conj(KER).unsqueeze(-1).expand_as(S) * fft2(S)
     # print(Normin1.shape)
     #Hyperparamters to TUNE
-    alpha = 0.004
+    alpha = 0.016
     alpha_max = 2
     mu = 0.004
     wei_grad = 0.004
