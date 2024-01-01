@@ -22,6 +22,7 @@ def ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring):
         n = aniso.ndim
         aniso = aniso.unsqueeze(n)
         Latent_tv = torch.cat((Latent_tv,aniso),dim = n)
+    print(Latent_tv.shape)
     # print("TV")
     # print(Latent_tv.shape)
     # print(Latent_tv)
