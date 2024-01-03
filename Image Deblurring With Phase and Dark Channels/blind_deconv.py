@@ -6,7 +6,7 @@ from cho_code.threshold_pxpy_v1 import threshold_pxpy_v1
 from blind_deconv_main import blind_deconv_main
 from misc import conv2
 from misc import conv2Vector
-def blind_deconv(y, lambda_dark, lambda_grad, opts):
+def blind_deconv(y, lambda_ftr,lambda_dark, lambda_grad, opts):
     if opts['gamma_correct'] != 1:
         y = y.pow(opts['gamma_correct'])
     
@@ -58,7 +58,7 @@ def blind_deconv(y, lambda_dark, lambda_grad, opts):
         # print(f'shape of input before going into blind_deconv_main {ys.unsqueeze(2).shape}')
         # print(f'Ks klooked like this ')
         
-        ks, lambda_dark, lambda_grad, interim_latent = blind_deconv_main(ys.unsqueeze(2), ks, lambda_dark, lambda_grad, threshold, opts)
+        ks, lambda_ftr, lambda_dark, lambda_grad, interim_latent = blind_deconv_main(ys.unsqueeze(2), ks,lambda_ftr, lambda_dark, lambda_grad, threshold, opts)
         # print(ks)
         #remember to fix this later on 
         # print(ks)

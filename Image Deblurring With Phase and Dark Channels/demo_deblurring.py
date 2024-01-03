@@ -6,7 +6,8 @@ import cv2
 import os
 from blind_deconv import blind_deconv
 from ringing_artifacts_removal import ringing_artifacts_removal
-from misc import visualize_rgb ,visualize_image, gray_image, process_image
+from misc import visualize_rgb ,visualize_image, gray_image, process_image,PSNR
+from metrics import psnr
 # Import your Python implementations of necessary functions here.
 
 # Define your blind_deconv function and other required functions here.
@@ -14,8 +15,15 @@ from misc import visualize_rgb ,visualize_image, gray_image, process_image
 
 def main():
     # Specify your input image file path
-    image_path = 'images/plate.png'
-
+    blur_out = f'groundtruths/Blurry1_1.png'
+    opt = 0.0
+    for i in range(1,200):
+        gt_out = f'groundtruths/GroundTruth1_1_{i}.png'
+        opt += psnr(blur_out,gt_out)
+    # print(psnr(blur_out,gt_out))
+    print(opt/199.0)
+    image_path = 'images/blurry1_1.png'
+    # print()
     # Create the results directory if it doesn't exist
     results_dir = 'results'
     os.makedirs(results_dir, exist_ok=True)
@@ -29,11 +37,12 @@ def main():
         'xk_iter': 5,    # Iterations
         'gamma_correct': 1.0,
         'k_thresh': 20,
-        'kernel_size':25,
+        'kernel_size':35,
     }
 
     lambda_dark = 4e-3
     #Experimenting with lambda_dark set to 0
+    lambda_ftr = 4e-3
     lambda_dark = 0
     lambda_grad = 4e-3
     lambda_tv = 0.003
@@ -51,33 +60,7 @@ def main():
         # print(yg[0:5,0:5])
     # Perform blind deconvolution
     
-    kernel, interim_latent = blind_deconv(yg, lambda_dark, lambda_grad, opts)
-#     kernel = torch.tensor([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0099265,0.015919,0.010086,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0036187,0.015606,0.060728,0.038325,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0042023,0.040154,0.048887,0.0091851,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.011804,0.033471,0.01206,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.029005,0.029294,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0030654,0,0.01868,0.011595,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.028279,0.029862,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.01759,0.014992,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0,0.0046892,0.024679,0.021488,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0,0,0.02205,0.017507,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0.0088884,0.015242,0.0090593,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0,0,0.028151,0.016205,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0.005866,0.0044465,0,0.0068521,0.0067505,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0.0096199,0.026531,0.0095686,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0,0,0,0.01683,0.0091419,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0.0032328,0.012922,0.018299,0.0042121,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0,0,0.0081076,0.020771,0.0084723,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0.0035008,0.011957,0.014806,0.0058203,0.0068514,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0,0.010201,0.0201,0.008574,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0.00444,0.0085013,0.0098339,0.007389,0.008998,0.0038731,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0.0087442,0.01796,0.0068179,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-# 0,0,0.0057154,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-# ]).reshape(25,25)
+    kernel, interim_latent = blind_deconv(yg, lambda_ftr,lambda_dark, lambda_grad, opts)
     plt.figure(figsize=(12, 6))
     plt.imshow(kernel, cmap='gray')
     plt.title('Estimated Kernel')
@@ -101,6 +84,20 @@ def main():
     # Latent = Latent/255.0
     # print(Latent[0:5,0:5,0])
     visualize_rgb(Latent)
+    #save the Latent matrix as a JPG image in the results folder
+    Latent[Latent>1.0] = 1.0
+    Latent[Latent<0.0] = 0.0
+    gt = Image.open(f'groundtruths/GroundTruth1_1_1.png')
+    gt = process_image(gt)/255.0
+    # print(Latent.shape )
+    print(PSNR(gt.permute(1,2,0),Latent))
+    Latent = Latent*255.0
+    Latent = Latent.numpy()
+    Latent = Latent.astype('uint8')
+    Latent = Image.fromarray(Latent)
+    Latent.save(os.path.join(results_dir, f'{image_path[7:-4]}.png'))
+
+    
     # Lmx = Latent.max()
     # Lmn = Latent.min()
     # Latent = (Latent - Lmn)/(Lmx - Lmn)

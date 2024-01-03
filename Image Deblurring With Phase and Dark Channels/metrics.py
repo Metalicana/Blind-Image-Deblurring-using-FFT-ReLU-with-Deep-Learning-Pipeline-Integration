@@ -17,7 +17,7 @@ def psnr(path1, path2):
     if mse == 0:
         psnr = 100  # PSNR is infinite if images are identical
     else:
-        psnr = 20 * log10(max_pixel_value) - 10 * log10(mse)
+        psnr = 20.0 * log10(max_pixel_value) - 10.0 * log10(mse)
 
     return psnr
 

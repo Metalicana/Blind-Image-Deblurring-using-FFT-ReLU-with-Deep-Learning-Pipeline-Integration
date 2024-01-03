@@ -33,7 +33,7 @@ def connected_components(bw):
 
     return CC
 
-def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
+def blind_deconv_main(blur_B, k, lambda_ftr, lambda_dark, lambda_grad, threshold, opts):
     # Derivative filters
     dx = torch.Tensor([[-1, 1], [0, 0]])
     dy = torch.Tensor([[-1, 0], [1, 0]])
@@ -63,7 +63,7 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
             # print(blur_B[0:10,0:10].squeeze())
             # print(k)
             # print(lambda_grad)
-            S = L0Deblur_FTR(blur_B, k, lambda_grad, 2.0)
+            S = L0Deblur_FTR(blur_B, k, lambda_ftr, lambda_grad, 2.0)
             # from misc import visualize_image
             # visualize_image(S.squeeze())
 
@@ -104,6 +104,8 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
             lambda_grad = max(lambda_grad / 1.1, 1e-4)
         else:
             lambda_grad = 0
+        if lambda_ftr != 0:
+            lambda_ftr = max(lambda_ftr / 1.1, 1e-4)
         #git hub aint working
         # Visualization (you may need to modify this part)
         # To display images in Python, you can use libraries like Matplotlib
@@ -131,7 +133,7 @@ def blind_deconv_main(blur_B, k, lambda_dark, lambda_grad, threshold, opts):
     k[k < 0] = 0
     k /= torch.sum(k)
     
-    return k, lambda_dark, lambda_grad, S
+    return k, lambda_ftr,lambda_dark, lambda_grad, S
 
 # You'll need to implement or import the missing functions (e.g., L0Deblur_dark_chanel, L0Restoration, estimate_psf,
 # threshold_pxpy_v1, and connected_components) as well as set up the visualization and image saving part.

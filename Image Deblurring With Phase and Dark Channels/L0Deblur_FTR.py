@@ -2,7 +2,7 @@ import torch
 from cho_code.wrap_boundary_liu import wrap_boundary_liu
 from cho_code.opt_fft_size import opt_fft_size
 from misc import psf2otf, fft, fft2, ifft, ifft2, findM
-def L0Deblur_FTR(Im, kernel, lambda_, kappa=2.0):
+def L0Deblur_FTR(Im, kernel, lambda_, wei_grad,kappa=2.0):
     if not kappa:
         kappa = 2.0
     
@@ -50,10 +50,10 @@ def L0Deblur_FTR(Im, kernel, lambda_, kappa=2.0):
         Normin1 = torch.conj(KER).unsqueeze(-1).expand_as(S) * fft2(S)
     # print(Normin1.shape)
     #Hyperparamters to TUNE
-    alpha = 0.016
-    alpha_max = 2
+    alpha = lambda_
+    alpha_max = .1
     mu = 0.004
-    wei_grad = 0.004
+    # wei_grad = 0.004
     while alpha < alpha_max:
         ftr = findM(S)
         Mat = ftr.clone().detach()

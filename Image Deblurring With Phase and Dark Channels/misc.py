@@ -1,4 +1,5 @@
 import torch
+from math import log10
 import torch.fft as fft
 import torch.nn.functional as F
 from matplotlib import pyplot as plt
@@ -284,3 +285,12 @@ def findM(I):
         result = torch.mul(L, Ic)
 
     return result
+
+def PSNR(output, ground_truth):
+    mse = torch.mean((output - ground_truth) ** 2)
+    max_pixel_value = 1.0  # Assuming normalized tensors in the range [0, 1], replace with 255 if needed
+    if mse == 0:
+        psnr = 100  # PSNR is infinite if images are identical
+    else:
+        psnr = 20 * log10(max_pixel_value) - 10 * log10(mse)
+    return psnr
