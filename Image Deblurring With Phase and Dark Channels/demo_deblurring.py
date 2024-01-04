@@ -15,14 +15,8 @@ from metrics import psnr
 
 def main():
     # Specify your input image file path
-    blur_out = f'groundtruths/Blurry1_1.png'
-    opt = 0.0
-    for i in range(1,200):
-        gt_out = f'groundtruths/GroundTruth1_1_{i}.png'
-        opt += psnr(blur_out,gt_out)
-    # print(psnr(blur_out,gt_out))
-    print(opt/199.0)
-    image_path = 'images/blurry1_1.png'
+   
+    image_path = 'images/blurry1_9.png'
     # print()
     # Create the results directory if it doesn't exist
     results_dir = 'results'
@@ -37,14 +31,14 @@ def main():
         'xk_iter': 5,    # Iterations
         'gamma_correct': 1.0,
         'k_thresh': 20,
-        'kernel_size':35,
+        'kernel_size':159,
     }
 
     lambda_dark = 4e-3
     #Experimenting with lambda_dark set to 0
     lambda_ftr = 4e-3
     lambda_dark = 0
-    lambda_grad = 4e-3
+    lambda_grad = 9e-3
     lambda_tv = 0.003
     lambda_l0 = 5e-4
     weight_ring = 1
@@ -83,19 +77,15 @@ def main():
     # print(Latent.max())
     # Latent = Latent/255.0
     # print(Latent[0:5,0:5,0])
-    visualize_rgb(Latent)
+    # visualize_rgb(Latent)
     #save the Latent matrix as a JPG image in the results folder
     Latent[Latent>1.0] = 1.0
     Latent[Latent<0.0] = 0.0
-    gt = Image.open(f'groundtruths/GroundTruth1_1_1.png')
-    gt = process_image(gt)/255.0
-    # print(Latent.shape )
-    print(PSNR(gt.permute(1,2,0),Latent))
     Latent = Latent*255.0
     Latent = Latent.numpy()
     Latent = Latent.astype('uint8')
     Latent = Image.fromarray(Latent)
-    Latent.save(os.path.join(results_dir, f'{image_path[7:-4]}.png'))
+    Latent.save(os.path.join(results_dir, f'Radi1_9.png'))
 
     
     # Lmx = Latent.max()
