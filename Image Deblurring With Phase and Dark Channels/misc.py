@@ -265,7 +265,7 @@ def findM(I):
     criterion = torch.nn.MSELoss()
 
     # Set up an optimizer
-    optimizer = torch.optim.SGD([L.requires_grad_()], lr=0.1)
+    optimizer = torch.optim.SGD([L.requires_grad_()], lr=.5)
 
     num_steps = 100
 
