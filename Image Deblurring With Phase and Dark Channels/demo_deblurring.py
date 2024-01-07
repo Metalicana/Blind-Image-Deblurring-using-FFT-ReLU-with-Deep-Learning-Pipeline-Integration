@@ -16,7 +16,7 @@ from metrics import psnr
 def main():
     # Specify your input image file path
    
-    image_path = 'images/blurry2_8.png'
+    image_path = 'images/blurry3_8.png'
     # print()
     # Create the results directory if it doesn't exist
     results_dir = 'results'
@@ -31,17 +31,17 @@ def main():
         'xk_iter': 5,    # Iterations
         'gamma_correct': 1.0,
         'k_thresh': 20,
-        'kernel_size':121,
+        'kernel_size':179,
     }
 
     lambda_dark = 4e-3
     #Experimenting with lambda_dark set to 0
     lambda_ftr = 4e-1
     lambda_dark = 0
-    lambda_grad = 4e-3
-    lambda_tv = 0.0035
+    lambda_grad = 4e-1
+    lambda_tv = 0.001
     # lambda_l0 = 5e-4
-    lambda_l0 = 3e-4
+    lambda_l0 = 2e-4
     weight_ring = 1
     is_select = False  # Set to True if you want to select a specific area for deblurring
 
@@ -86,7 +86,7 @@ def main():
     Latent = Latent.numpy()
     Latent = Latent.astype('uint8')
     Latent = Image.fromarray(Latent)
-    Latent.save(os.path.join(results_dir, f'Radi2_8.png'))
+    Latent.save(os.path.join(results_dir, f'Radi3_8.png'))
 
     kmn = kernel.min()
     kmx = kernel.max()
@@ -95,7 +95,7 @@ def main():
     kernel = kernel.numpy()
     kernel = kernel.astype('uint8')
     kernel = Image.fromarray(kernel)
-    kernel.save(os.path.join(results_dir, f'Radi2_8_kernel.png'))    
+    kernel.save(os.path.join(results_dir, f'Radi3_8_kernel.png'))    
     # Lmx = Latent.max()
     # Lmn = Latent.min()
     # Latent = (Latent - Lmn)/(Lmx - Lmn)
