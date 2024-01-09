@@ -15,8 +15,48 @@ from metrics import psnr
 
 def main():
     # Specify your input image file path
-   
-    image_path = 'images/blurry3_8.png'
+    image_path = 'images/Blurry1_10.png'
+    opts = {
+        'prescale': 1,   # Downsampling
+        'xk_iter': 5,    # Iterations
+        'gamma_correct': 1.0,
+        'k_thresh': 20,
+        'kernel_size':195,
+    }
+
+    lambda_dark = 4e-3
+    #Experimenting with lambda_dark set to 0
+    lambda_ftr = 4e-2
+    lambda_dark = 0
+    lambda_grad = 4.09e-3
+
+
+    lambda_tv = 0.001
+    # lambda_l0 = 5e-4
+    lambda_l0 = 5e-4
+    weight_ring = 1
+
+    
+    # image_path = 'images/blurry4_8.png'
+    # opts = {
+    #     'prescale': 1,   # Downsampling
+    #     'xk_iter': 5,    # Iterations
+    #     'gamma_correct': 1.0,
+    #     'k_thresh': 20,
+    #     'kernel_size':197,
+    # }
+
+    # lambda_dark = 4e-3
+    # #Experimenting with lambda_dark set to 0
+    # lambda_ftr = 4e-1
+    # lambda_dark = 0
+    # lambda_grad = 4e-3
+
+
+    # lambda_tv = 0.001
+    # # lambda_l0 = 5e-4
+    # lambda_l0 = 3e-4
+    # weight_ring = 1
     # print()
     # Create the results directory if it doesn't exist
     results_dir = 'results'
@@ -26,23 +66,7 @@ def main():
     image = cv2.imread(image_path)
 
     # Set parameters
-    opts = {
-        'prescale': 1,   # Downsampling
-        'xk_iter': 5,    # Iterations
-        'gamma_correct': 1.0,
-        'k_thresh': 20,
-        'kernel_size':179,
-    }
-
-    lambda_dark = 4e-3
-    #Experimenting with lambda_dark set to 0
-    lambda_ftr = 4e-1
-    lambda_dark = 0
-    lambda_grad = 4e-1
-    lambda_tv = 0.001
-    # lambda_l0 = 5e-4
-    lambda_l0 = 2e-4
-    weight_ring = 1
+    
     is_select = False  # Set to True if you want to select a specific area for deblurring
 
     if is_select:
@@ -86,7 +110,7 @@ def main():
     Latent = Latent.numpy()
     Latent = Latent.astype('uint8')
     Latent = Image.fromarray(Latent)
-    Latent.save(os.path.join(results_dir, f'Radi3_8.png'))
+    Latent.save(os.path.join(results_dir, f'Radi1_10.png'))
 
     kmn = kernel.min()
     kmx = kernel.max()
@@ -95,7 +119,7 @@ def main():
     kernel = kernel.numpy()
     kernel = kernel.astype('uint8')
     kernel = Image.fromarray(kernel)
-    kernel.save(os.path.join(results_dir, f'Radi3_8_kernel.png'))    
+    kernel.save(os.path.join(results_dir, f'Radi1_10_kernel.png'))    
     # Lmx = Latent.max()
     # Lmn = Latent.min()
     # Latent = (Latent - Lmn)/(Lmx - Lmn)
