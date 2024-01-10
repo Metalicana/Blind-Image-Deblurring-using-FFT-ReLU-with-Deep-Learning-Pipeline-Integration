@@ -7,6 +7,12 @@ import torchvision.transforms as transforms
 
 def gray_image(inpt):
     image = process_image(inpt)
+    print(image.shape[0])
+    if(image.shape[0] == 1):
+        image = image.permute(1,2,0)
+        image = image/255.0
+        image = image.squeeze()
+        return image
     image = image.permute(1,2,0)
     yg =  image[:,:,0]*0.2989+ image[:,:,1]*0.587 + image[:,:,2]*0.114
     yg = torch.round(yg)
@@ -256,34 +262,47 @@ def findM(I):
     Ic = I.clone().detach()
     Ic = Ic.squeeze()
     X = fft_relu(Ic)
-    
+    # X = (X- X.min())/(X.max() - X.min())
+    # print(X)
     # Create L without gradient tracking
     with torch.no_grad():
-        L = torch.zeros(X.shape[0], X.shape[1])
+        L = torch.zeros(X.shape[0], X.shape[1]).type(torch.float32)
 
     # Define the optimization criterion (e.g., Frobenius norm)
     criterion = torch.nn.MSELoss()
 
     # Set up an optimizer
-    optimizer = torch.optim.SGD([L.requires_grad_()], lr=.5)
+    optimizer = torch.optim.Adam([L.requires_grad_()], lr=0.05)
 
     num_steps = 100
-
+    a = torch.zeros((1,100)).type(torch.float32)
     for step in range(num_steps):
         optimizer.zero_grad()
         predicted_X = torch.mul(L, Ic)
+        # if torch.max(predicted_X)!=torch.min(predicted_X):
+            # predicted_X.data = (predicted_X - torch.min(predicted_X)) / (torch.max(predicted_X) - torch.min(predicted_X))
+            # predicted_X.data = predicted_X.data / torch.max(predicted_X)
         loss = criterion(predicted_X, X)
         loss.backward()
+        # if torch.max(L)!=torch.min(L):
+            # L.data = (L - torch.min(L)) / (torch.max(L) - torch.min(L))
+            # L.data = L.data / torch.max(L)
 
         optimizer.step()
-
-        if step % 100 == 0:
+        # print(step)
+        a[0,step] = loss.item()
+        # print(loss.item())
+        if step % 99 == 0:
             print(f"Step [{step+1}/{num_steps}], Loss: {loss.item()}")
 
     # Return the result without gradients
     with torch.no_grad():
-        result = torch.mul(L, Ic)
-
+        result = L.clone().detach()
+    plt.plot(a.squeeze().numpy())
+    plt.title('Convergence of Gradient Descent')
+    plt.xlabel('Steps')
+    plt.ylabel('Loss')
+    # plt.show()
     return result
 
 def PSNR(output, ground_truth):

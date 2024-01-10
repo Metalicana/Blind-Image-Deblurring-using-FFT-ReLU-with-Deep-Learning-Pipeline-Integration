@@ -51,7 +51,7 @@ def L0Deblur_FTR(Im, kernel, lambda_, wei_grad,kappa=2.0):
     # print(Normin1.shape)
     #Hyperparamters to TUNE
     alpha = lambda_
-    alpha_max = 8
+    alpha_max =.001
     mu = 0.004
     # wei_grad = 0.004
     while alpha < alpha_max:

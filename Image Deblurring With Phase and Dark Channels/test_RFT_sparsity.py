@@ -6,7 +6,7 @@ import cv2
 import os
 from blind_deconv import blind_deconv
 from ringing_artifacts_removal import ringing_artifacts_removal
-from misc import visualize_rgb ,visualize_image, gray_image, process_image,PSNR, fft_relu
+from misc import visualize_rgb ,visualize_image, gray_image, process_image,PSNR, fft_relu, findM
 from metrics import psnr
 import numpy as np
 def main():
@@ -26,7 +26,7 @@ def main():
             y = process_image(Image.open(image_path))
             y = y.permute(1,2,0)
             y = y/255.0
-            a = fft_relu(y)
+            a = findM(y)
             a = (a - a.min())/ (a.max() - a.min( ))
             a = torch.sum(a)
             list_a[0,l] = a

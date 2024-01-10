@@ -22,7 +22,7 @@ def main():
     # list = [4.2e-2,4.22e-2,4.18e-2,4.3e-2,3.8e-2]
     #4.2e-2, 4e-2, 4e-3, 4.1e-2
     for j in range(4):
-        for i in range(8,11):
+        for i in range(12):
             image_path = f'images/blurry{j+1}_{i+1}.png'
             # print()
             # Create the results directory if it doesn't exist
@@ -37,12 +37,12 @@ def main():
                 'xk_iter': 5,    # Iterations
                 'gamma_correct': 1.0,
                 'k_thresh': 20,
-                'kernel_size':197,
+                'kernel_size':75,
             }
 
             lambda_dark = 4e-3
             #Experimenting with lambda_dark set to 0
-            lambda_ftr = 4e-3
+            lambda_ftr = 2.98e-4
             lambda_dark = 0
             lambda_grad = 4e-3
 

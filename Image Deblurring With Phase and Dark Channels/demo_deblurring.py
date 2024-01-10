@@ -15,20 +15,21 @@ from metrics import psnr
 
 def main():
     # Specify your input image file path
-    image_path = 'images/Blurry1_10.png'
+    image_path = 'images/1_1_blurred.png'
     opts = {
         'prescale': 1,   # Downsampling
         'xk_iter': 5,    # Iterations
         'gamma_correct': 1.0,
         'k_thresh': 20,
-        'kernel_size':195,
+        'kernel_size':41,
     }
 
     lambda_dark = 4e-3
     #Experimenting with lambda_dark set to 0
-    lambda_ftr = 4e-2
+    lambda_ftr = 2.98e-4
     lambda_dark = 0
-    lambda_grad = 4.09e-3
+    # lambda_grad = 3.87e-4
+    lambda_grad = 4e-3
 
 
     lambda_tv = 0.001
@@ -106,11 +107,12 @@ def main():
     #save the Latent matrix as a JPG image in the results folder
     Latent[Latent>1.0] = 1.0
     Latent[Latent<0.0] = 0.0
+    Latent = Latent.squeeze()
     Latent = Latent*255.0
     Latent = Latent.numpy()
     Latent = Latent.astype('uint8')
     Latent = Image.fromarray(Latent)
-    Latent.save(os.path.join(results_dir, f'Radi1_10.png'))
+    Latent.save(os.path.join(results_dir, f'1_1_blurred.png'))
 
     kmn = kernel.min()
     kmx = kernel.max()
@@ -119,7 +121,7 @@ def main():
     kernel = kernel.numpy()
     kernel = kernel.astype('uint8')
     kernel = Image.fromarray(kernel)
-    kernel.save(os.path.join(results_dir, f'Radi1_10_kernel.png'))    
+    kernel.save(os.path.join(results_dir, f'1_1_blurred_kernel.png'))    
     # Lmx = Latent.max()
     # Lmn = Latent.min()
     # Latent = (Latent - Lmn)/(Lmx - Lmn)
