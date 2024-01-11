@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 
 def gray_image(inpt):
     image = process_image(inpt)
-    print(image.shape[0])
+    # print(image.shape[0])
     if(image.shape[0] == 1):
         image = image.permute(1,2,0)
         image = image/255.0

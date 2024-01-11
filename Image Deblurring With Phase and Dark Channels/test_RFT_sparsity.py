@@ -26,7 +26,8 @@ def main():
             y = process_image(Image.open(image_path))
             y = y.permute(1,2,0)
             y = y/255.0
-            a = findM(y)
+            # a = findM(y)
+            a = fft_relu(y)
             a = (a - a.min())/ (a.max() - a.min( ))
             a = torch.sum(a)
             list_a[0,l] = a

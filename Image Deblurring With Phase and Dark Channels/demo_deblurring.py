@@ -15,24 +15,25 @@ from metrics import psnr
 
 def main():
     # Specify your input image file path
-    image_path = 'images/1_1_blurred.png'
+    # image_path = 'images/blurry1_8.png'
+    image_path = f'images/Levin_small/1.png'
     opts = {
         'prescale': 1,   # Downsampling
         'xk_iter': 5,    # Iterations
         'gamma_correct': 1.0,
         'k_thresh': 20,
-        'kernel_size':41,
+        'kernel_size':15,
     }
 
     lambda_dark = 4e-3
     #Experimenting with lambda_dark set to 0
-    lambda_ftr = 2.98e-4
+    lambda_ftr = 2.98e-3
     lambda_dark = 0
     # lambda_grad = 3.87e-4
     lambda_grad = 4e-3
 
 
-    lambda_tv = 0.001
+    lambda_tv = 0.003
     # lambda_l0 = 5e-4
     lambda_l0 = 5e-4
     weight_ring = 1
@@ -112,7 +113,7 @@ def main():
     Latent = Latent.numpy()
     Latent = Latent.astype('uint8')
     Latent = Image.fromarray(Latent)
-    Latent.save(os.path.join(results_dir, f'1_1_blurred.png'))
+    Latent.save(os.path.join(results_dir, f'Levin_1.png'))
 
     kmn = kernel.min()
     kmx = kernel.max()
@@ -121,7 +122,7 @@ def main():
     kernel = kernel.numpy()
     kernel = kernel.astype('uint8')
     kernel = Image.fromarray(kernel)
-    kernel.save(os.path.join(results_dir, f'1_1_blurred_kernel.png'))    
+    kernel.save(os.path.join(results_dir, f'Levin_1_kernel.png'))    
     # Lmx = Latent.max()
     # Lmn = Latent.min()
     # Latent = (Latent - Lmn)/(Lmx - Lmn)

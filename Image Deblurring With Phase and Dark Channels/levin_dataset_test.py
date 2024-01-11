@@ -37,7 +37,7 @@ def main():
                 'xk_iter': 5,    # Iterations
                 'gamma_correct': 1.0,
                 'k_thresh': 20,
-                'kernel_size':41,
+                'kernel_size':27,
             }
 
             lambda_dark = 4e-3
@@ -47,7 +47,7 @@ def main():
             lambda_grad = 4e-3
 
 
-            lambda_tv = 0.001
+            lambda_tv = 0.003
             lambda_l0 = 5e-4
             # lambda_l0 = list[i]
             weight_ring = 1

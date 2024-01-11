@@ -37,7 +37,7 @@ def main():
                 'xk_iter': 5,    # Iterations
                 'gamma_correct': 1.0,
                 'k_thresh': 20,
-                'kernel_size':75,
+                'kernel_size':131,
             }
 
             lambda_dark = 4e-3
