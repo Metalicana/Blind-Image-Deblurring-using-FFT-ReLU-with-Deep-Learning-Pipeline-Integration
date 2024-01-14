@@ -24,6 +24,7 @@ def psnr(path1, path2):
 def ssim(path1, path2):   
     image1 = cv2.imread(path1)  
     image2 = cv2.imread(path2)
+    # image2 = image2[50:-50,50:-50]
 
     gray_image1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
     gray_image2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)

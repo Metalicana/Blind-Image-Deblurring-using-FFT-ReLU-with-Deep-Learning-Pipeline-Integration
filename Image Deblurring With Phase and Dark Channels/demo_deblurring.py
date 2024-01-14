@@ -8,6 +8,7 @@ from blind_deconv import blind_deconv
 from ringing_artifacts_removal import ringing_artifacts_removal
 from misc import visualize_rgb ,visualize_image, gray_image, process_image,PSNR
 from metrics import psnr
+import time
 # Import your Python implementations of necessary functions here.
 
 # Define your blind_deconv function and other required functions here.
@@ -16,24 +17,25 @@ from metrics import psnr
 def main():
     # Specify your input image file path
     # image_path = 'images/blurry1_8.png'
-    image_path = f'images/Levin_small/1.png'
+    image_path = 'images/wall.png'
     opts = {
         'prescale': 1,   # Downsampling
         'xk_iter': 5,    # Iterations
         'gamma_correct': 1.0,
         'k_thresh': 20,
-        'kernel_size':15,
+        'kernel_size':53,
     }
 
     lambda_dark = 4e-3
     #Experimenting with lambda_dark set to 0
-    lambda_ftr = 2.98e-3
+    lambda_ftr = 2.98e-4
+    # lambda_ftr = 1000
     lambda_dark = 0
     # lambda_grad = 3.87e-4
     lambda_grad = 4e-3
 
 
-    lambda_tv = 0.003
+    lambda_tv = 0.001
     # lambda_l0 = 5e-4
     lambda_l0 = 5e-4
     weight_ring = 1
@@ -80,8 +82,10 @@ def main():
 
         # print(yg[0:5,0:5])
     # Perform blind deconvolution
-    
+    start_time = time.time()
     kernel, interim_latent = blind_deconv(yg, lambda_ftr,lambda_dark, lambda_grad, opts)
+    end_time = time.time()
+    print(f"Time taken: {end_time-start_time} seconds")
     plt.figure(figsize=(12, 6))
     plt.imshow(kernel, cmap='gray')
     plt.title('Estimated Kernel')
@@ -113,7 +117,7 @@ def main():
     Latent = Latent.numpy()
     Latent = Latent.astype('uint8')
     Latent = Image.fromarray(Latent)
-    Latent.save(os.path.join(results_dir, f'Levin_1.png'))
+    Latent.save(os.path.join(results_dir, f'wall_without_l0.png'))
 
     kmn = kernel.min()
     kmx = kernel.max()
@@ -122,7 +126,7 @@ def main():
     kernel = kernel.numpy()
     kernel = kernel.astype('uint8')
     kernel = Image.fromarray(kernel)
-    kernel.save(os.path.join(results_dir, f'Levin_1_kernel.png'))    
+    kernel.save(os.path.join(results_dir, f'wall_without_kernel.png'))    
     # Lmx = Latent.max()
     # Lmn = Latent.min()
     # Latent = (Latent - Lmn)/(Lmx - Lmn)

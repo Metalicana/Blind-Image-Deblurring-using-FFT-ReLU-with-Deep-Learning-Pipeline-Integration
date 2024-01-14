@@ -6,7 +6,7 @@ import cv2
 import os
 from blind_deconv import blind_deconv
 from ringing_artifacts_removal import ringing_artifacts_removal
-from misc import visualize_rgb ,visualize_image, gray_image, process_image,PSNR
+from misc import visualize_rgb ,visualize_image, gray_image, process_image,PSNR, average_surrounding
 from metrics import psnr
 # Import your Python implementations of necessary functions here.
 
@@ -20,13 +20,15 @@ def main():
     # list = [25, 31, 35, 39, 41, 45, 49]
     # list = [ 4e-5, 3e-5, 2e-5 ,4e-3, 3e-3, 2e-3,4e-2, 3e-2, 2e-2]
     # list = [4.2e-2,4.22e-2,4.18e-2,4.3e-2,3.8e-2]
+    list = [41, 41, 43,43, 41,21,41,41]
     #4.2e-2, 4e-2, 4e-3, 4.1e-2
-    for j in range(80):
+
+    for j in range(20):
         for i in range(8):
             image_path = f'images/Levin/{j+1}_{i+1}_blurred.png'
             # print()
             # Create the results directory if it doesn't exist
-            results_dir = 'results'
+            results_dir = f'results/Levin_dynamic'
             os.makedirs(results_dir, exist_ok=True)
 
             # Load the image
@@ -37,7 +39,7 @@ def main():
                 'xk_iter': 5,    # Iterations
                 'gamma_correct': 1.0,
                 'k_thresh': 20,
-                'kernel_size':27,
+                'kernel_size':list[i],
             }
 
             lambda_dark = 4e-3
@@ -47,7 +49,7 @@ def main():
             lambda_grad = 4e-3
 
 
-            lambda_tv = 0.003
+            lambda_tv = 0.005
             lambda_l0 = 5e-4
             # lambda_l0 = list[i]
             weight_ring = 1
@@ -58,7 +60,11 @@ def main():
                 pass
             else:
                 inpt = Image.open(image_path)
+                
                 yg = gray_image(inpt)
+                if i == 5:
+                    yg = yg[50:-50,50:-50]
+                # yg = yg[50:-50,50:-50]
 
                 # print(yg[0:5,0:5])
             # Perform blind deconvolution
@@ -75,6 +81,7 @@ def main():
                 y = process_image(Image.open(image_path))
                 y = y.permute(1,2,0)
                 y = y/255.0
+                y = y[50:-50,50:-50]
                 # print(y[0:5,0:5,0])
                 # print(y.shape)
                 Latent = ringing_artifacts_removal(y, kernel, lambda_tv, lambda_l0, weight_ring)
@@ -91,11 +98,12 @@ def main():
             Latent[Latent>1.0] = 1.0
             Latent[Latent<0.0] = 0.0
             Latent = Latent*255.0
+            # Latent = average_surrounding(Latent)
             Latent = Latent.squeeze()
             Latent = Latent.numpy()
             Latent = Latent.astype('uint8')
             Latent = Image.fromarray(Latent)
-            Latent.save(os.path.join(results_dir, f'Levin_Radi_{j+1}_{i+1}.png'))
+            Latent.save(os.path.join(results_dir, f'Levin_Radi_{j+1}_{i+1}_23.png'))
 
             kmn = kernel.min()
             kmx = kernel.max()
@@ -105,7 +113,7 @@ def main():
             kernel = kernel.astype('uint8')
             kernel = Image.fromarray(kernel)
             kernel.save(os.path.join(results_dir, f'Levin_Radi_{j+1}_{i+1}_kernel.png'))    
-    # Lmx = Latent.max()
+# Lmx = Latent.max()
     # Lmn = Latent.min()
     # Latent = (Latent - Lmn)/(Lmx - Lmn)
     # visualize_rgb(Latent)

@@ -313,3 +313,31 @@ def PSNR(output, ground_truth):
     else:
         psnr = 20 * log10(max_pixel_value) - 10 * log10(mse)
     return psnr
+
+
+
+def average_surrounding(tensor):
+    # Define the kernel for the convolution operation
+    kernel = torch.tensor([[1/8, 1/8, 1/8],
+                             [1/8, 0.0, 1/8],
+                             [1/8, 1/8, 1/8]])
+    
+    # Add two dimensions to the kernel for batch and channel
+    
+    
+    # Check if the tensor is on GPU and if so, send the kernel to GPU
+    if tensor.is_cuda:
+        kernel = kernel.cuda()
+    
+    # Apply padding and perform the convolution operation
+    result = conv2(tensor, kernel, 'full')
+    result = result[0:tensor.shape[0],0:tensor.shape[1],:]
+    return result
+    # return result
+    # Create a mask of the saturated pixels
+    mask = (tensor == 0) | (tensor == 255)
+    
+    # Replace the saturated pixels with the average of the surrounding pixels
+    # tensor[mask] = result[mask]
+    
+    # return tensor

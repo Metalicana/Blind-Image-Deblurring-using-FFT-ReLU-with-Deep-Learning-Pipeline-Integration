@@ -24,11 +24,15 @@ def main():
     # real_path = f'../../Levin_sharp/trueture/img{j+1}_groundtruth_img.png'
     # image_path = f'../../Levin_sharp/groundtruth_kernel_latent_zoran/Kernel_{i+1}/{j+1}_gtk_latent_zoran.png'
     # deblurred_path = f'results/Levin_Radi_{j+1}_{i+1}.png'
+    l = 0
+    x = 0
+    list = []
     for j in range(80):
         for i in range(8):
             real_path = f'../../Levin_sharp/trueture/img{j+1}_groundtruth_img.png'
             image_path = f'../../Levin_sharp/groundtruth_kernel_latent_zoran/Kernel_{i+1}/{j+1}_gtk_latent_zoran.png'
             deblurred_path = f'results/Levin_Radi_{j+1}_{i+1}.png'
+            # deblurred_path = f'../../Levin_sharp/all_deblur_results/img{j+1}_kernel{i+1}_ChoAndLee_img.png'
 
             real = Image.open(real_path)
             real = gray_image(real)
@@ -44,13 +48,24 @@ def main():
             diff1 = img[75:-75,75:-75] - real
             diff1 = diff1**2
             diff1 = torch.sum(diff1)
-            diff2 = deblur[50:-50, 50:-50] - real
-            # diff2 = deblur- real
+            diff2 = deblur - real
+
+            # diff2 = deblur[50:-50,50:-50]- real
             diff2 = diff2**2
             diff2 = torch.sum(diff2)
+            if l>100:
+                break
             ans = (diff2 / diff1).item()
             print(ans)
-            
+            list.append(ans)
+            if ans <5:
+                x+=1
+            l+=1
+        if l > 100:
+            break;
+    list.sort()
+    print(x)
+    print(list)
     # Lmx = Latent.max()
     # Lmn = Latent.min()
     # Latent = (Latent - Lmn)/(Lmx - Lmn)
