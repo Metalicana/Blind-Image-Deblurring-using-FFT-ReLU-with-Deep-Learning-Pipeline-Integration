@@ -31,13 +31,14 @@ def main():
             a = (a - a.min())/ (a.max() - a.min( ))
             a = torch.sum(a)
             list_a[0,l] = a
-
+            # print(list_a[0,l].item())
             
             b = fft_relu(x)
             # b = b/torch.max(b)
             b = (b - b.min())/ (b.max() - b.min( ))
             b = torch.sum(b)
             list_b[0,l] = b
+            print(b.item())
             l+=1
 
             # print(list_a[0,(i+1)*(j+1)-1], list_b[0,(i+1)*(j+1)-1])

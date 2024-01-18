@@ -9,6 +9,7 @@ from ringing_artifacts_removal import ringing_artifacts_removal
 from misc import visualize_rgb ,visualize_image, gray_image, process_image,PSNR
 from metrics import psnr
 import time
+import sys
 # Import your Python implementations of necessary functions here.
 
 # Define your blind_deconv function and other required functions here.
@@ -17,15 +18,22 @@ import time
 def main():
     # Specify your input image file path
     # image_path = 'images/blurry1_8.png'
-    image_path = 'images/wall.png'
+    args = sys.argv[1:]
+    path = args[0]
+    image_path = f'images/{path}'
+    # print(sys.argv[1,1])
+    if(len(args) > 1):
+        kernel_size = int(args[1])
+    else:
+        kernel_size = 29
     opts = {
         'prescale': 1,   # Downsampling
         'xk_iter': 5,    # Iterations
         'gamma_correct': 1.0,
         'k_thresh': 20,
-        'kernel_size':53,
+        'kernel_size':kernel_size,
     }
-
+    print(sys.argv[1])
     lambda_dark = 4e-3
     #Experimenting with lambda_dark set to 0
     lambda_ftr = 2.98e-4
@@ -108,16 +116,20 @@ def main():
     # print(Latent.max())
     # Latent = Latent/255.0
     # print(Latent[0:5,0:5,0])
-    # visualize_rgb(Latent)
+    
     #save the Latent matrix as a JPG image in the results folder
     Latent[Latent>1.0] = 1.0
     Latent[Latent<0.0] = 0.0
+    if Latent.shape[2] == 1:
+        visualize_image(Latent)
+    else:
+        visualize_rgb(Latent)
     Latent = Latent.squeeze()
     Latent = Latent*255.0
     Latent = Latent.numpy()
     Latent = Latent.astype('uint8')
     Latent = Image.fromarray(Latent)
-    Latent.save(os.path.join(results_dir, f'wall_without_l0.png'))
+    Latent.save(os.path.join(results_dir, f'result.png'))
 
     kmn = kernel.min()
     kmx = kernel.max()
@@ -126,7 +138,7 @@ def main():
     kernel = kernel.numpy()
     kernel = kernel.astype('uint8')
     kernel = Image.fromarray(kernel)
-    kernel.save(os.path.join(results_dir, f'wall_without_kernel.png'))    
+    kernel.save(os.path.join(results_dir, f'result_kernel.png'))    
     # Lmx = Latent.max()
     # Lmn = Latent.min()
     # Latent = (Latent - Lmn)/(Lmx - Lmn)
