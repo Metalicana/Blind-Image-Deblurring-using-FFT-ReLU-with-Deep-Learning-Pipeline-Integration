@@ -29,16 +29,19 @@ def main():
             # a = findM(y)
             a = fft_relu(y)
             a = (a - a.min())/ (a.max() - a.min( ))
-            a = torch.sum(a)
-            list_a[0,l] = a
+            a[a<0.2]=0
+            a = torch.nonzero(a)
+            list_a[0,l] = int(a.size(0))
             # print(list_a[0,l].item())
             
             b = fft_relu(x)
             # b = b/torch.max(b)
             b = (b - b.min())/ (b.max() - b.min( ))
-            b = torch.sum(b)
-            list_b[0,l] = b
-            print(b.item())
+            b[b<0.2]=0
+            b = torch.nonzero(b)
+            
+            list_b[0,l] = int(b.size(0))
+            # print(b.item())
             l+=1
 
             # print(list_a[0,(i+1)*(j+1)-1], list_b[0,(i+1)*(j+1)-1])
