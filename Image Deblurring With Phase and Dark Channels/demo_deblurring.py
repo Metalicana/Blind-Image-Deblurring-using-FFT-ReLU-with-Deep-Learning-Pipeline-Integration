@@ -33,13 +33,16 @@ def main():
         'k_thresh': 20,
         'kernel_size':kernel_size,
     }
-    print(sys.argv[1])
+    # print(sys.argv[1])
     lambda_dark = 4e-3
+
+
     #Experimenting with lambda_dark set to 0
     lambda_ftr = 2.98e-4
     # lambda_ftr = 1000
     lambda_dark = 0
     # lambda_grad = 3.87e-4
+    # lambda_grad = 4e-3
     lambda_grad = 4e-3
 
 
