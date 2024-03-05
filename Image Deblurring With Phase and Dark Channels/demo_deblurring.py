@@ -16,6 +16,7 @@ import sys
 
 
 def main():
+    plt.figure(figsize=(5, 5))
     # Specify your input image file path
     # image_path = 'images/blurry1_8.png'
     args = sys.argv[1:]
@@ -97,7 +98,7 @@ def main():
     kernel, interim_latent = blind_deconv(yg, lambda_ftr,lambda_dark, lambda_grad, opts)
     end_time = time.time()
     print(f"Time taken: {end_time-start_time} seconds")
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(5, 5))
     plt.imshow(kernel, cmap='gray')
     plt.title('Estimated Kernel')
     plt.show()

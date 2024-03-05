@@ -28,7 +28,8 @@ def ssim(path1, path2):
 
     gray_image1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
     gray_image2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
-
+    # print(gray_image1.shape)
+    # print(gray_image2.shape)
     ssim_index = s_sim(gray_image1, gray_image2)
     
     return ssim_index

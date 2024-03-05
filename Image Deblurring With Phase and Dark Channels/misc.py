@@ -19,12 +19,21 @@ def gray_image(inpt):
     yg = yg / 255.0
     return yg
 
+def process_gray(input_image) -> torch.Tensor:
+    transform = transforms.Compose([
+      transforms.Grayscale(),  # Convert to grayscale
+        transforms.ToTensor() 
+    ])
+    input_tensor = transform(input_image).type(torch.float32)
+
+    return input_tensor
+
 def process_image(input_image) -> torch.Tensor:
   transform = transforms.Compose([
       transforms.PILToTensor()
   ])
   input_tensor = transform(input_image).type(torch.float32)
-  
+
   return input_tensor
 
 def visualize_image(input_tensor):
@@ -299,6 +308,7 @@ def findM(I):
     with torch.no_grad():
         result = L.clone().detach()
     plt.plot(a.squeeze().numpy())
+    # plt.figure(figsize=(10, 10))
     plt.title('Convergence of Gradient Descent')
     plt.xlabel('Steps')
     plt.ylabel('Loss')

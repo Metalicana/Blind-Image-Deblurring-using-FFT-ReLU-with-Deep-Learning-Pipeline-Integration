@@ -28,26 +28,37 @@ def main():
     l = 0
     x = 0
     list = []
-    for j in range(1):
+    for j in range(4):
         x = 0
-        for i in range(80,100):
+        for i in range(8):
             
-            real_path = f'../../saturate_100_for_test/testset_public/gt_gray/{i+1}.png'
+            # real_path = f'../../saturate_100_for_test/testset_public/gt_gray/{i+1}.png'
+            real_path = f'groundtruths/Levin/im0{j+1}_ker0{i+1}.png'
+            # real_path = f'groundtruths/Levin/1_1.png'
             # image_path = f'../../Levin_sharp/groundtruth_kernel_latent_zoran/Kernel_{i+1}/{j+1}_gtk_latent_zoran.png'
-            deblurred_path = f'results/notun/{i+1}_sharp.png'
-            # deblurred_path = f'results/Levin_Radi_{j+1}_{i+1}.png'
+            # deblurred_path = f'results/result.png'
+            deblurred_path = f'results/Levin_dynamic/Levin_Radi_{j+1}_{i+1}_best.png'
             # deblurred_path = f'../../cvpr16_deblurring_code_v1/results/phase/{j+1}_{i+1}_result.png'
+            # deblurred_path = f'results/Levin_dynamic/pan/im0{j+5}_ker0{i+1}.png'
             real = gray_image(Image.open(real_path))
             radi = gray_image(Image.open(deblurred_path))
+            if(real.shape != radi.shape):
+                print(0)
+                continue
             # print(ssim(real_path, deblurred_path))
             # print(s_sim(real,radi[50:-50,50:-50] ))
-            print(ssim(real_path, deblurred_path))
             from misc import PSNR
+            # l += ssim(real_path, deblurred_path)
+            # x += PSNR(real,radi )
+            # print(ssim(real_path, deblurred_path))
+            print(PSNR(real,radi ))
+
             # print(PSNR(real,radi ))
             # x += PSNR(real,radi )
             # print(PSNR(real,radi ))
             # print(ssim(real_path,deblurred_path ))
         # print(x/8.0)
+        # print(l/8.0)
             # print(img[25:-25,25:-25].shape)
 
         

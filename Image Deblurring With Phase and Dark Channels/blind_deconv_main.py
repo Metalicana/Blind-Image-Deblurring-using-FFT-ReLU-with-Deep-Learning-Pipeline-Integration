@@ -63,8 +63,8 @@ def blind_deconv_main(blur_B, k, lambda_ftr, lambda_dark, lambda_grad, threshold
             # print(blur_B[0:10,0:10].squeeze())
             # print(k)
             # print(lambda_grad)
-            S = L0Restoration(blur_B,k, lambda_grad,2.0)
-            # S = L0Deblur_FTR(blur_B, k, lambda_ftr, lambda_grad, 2.0)
+            # S = L0Restoration(blur_B,k, lambda_grad,2.0)
+            S = L0Deblur_FTR(blur_B, k, lambda_ftr, lambda_grad, 2.0)
             # from misc import visualize_image
             # visualize_image(S.squeeze())
 
