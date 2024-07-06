@@ -17,31 +17,35 @@ import time
 
 
 
-
 def main():
     # Specify your input image file path
     # image_path = 'images/blurry1_8.png'
+    val = 1e-2
+    f = open("results.txt", "w")  
     for i in range(17):
         
-        image_path = 'images/Blurry1_3.png'
+        image_path = 'images/Levin/im01_ker01.png'
         gt_kernel_path = 'images/1.png'
         gt_kernel = gray_image(Image.open(gt_kernel_path))
+        gt_kernel = torch.flip(gt_kernel,[0,1])
         print(gt_kernel.shape)
         opts = {
             'prescale': 1,   # Downsampling
             'xk_iter': 5,    # Iterations
             'gamma_correct': 1.0,
             'k_thresh': 20,
-            'kernel_size':37,
+            'kernel_size':31,
         }
 
         lambda_dark = 4e-3
         #Experimenting with lambda_dark set to 0
-        lambda_ftr = 2.98e-3
+        lambda_ftr = val
+        val += 0.25e-2
         # lambda_ftr = 1000
         lambda_dark = 0
         # lambda_grad = 3.87e-4
-        lambda_grad = list[i]
+        lambda_grad = 4e-3
+
 
 
         lambda_tv = 0.001
@@ -93,11 +97,15 @@ def main():
         # Perform blind deconvolution
         start_time = time.time()
         kernel, interim_latent = blind_deconv(yg, lambda_ftr,lambda_dark, lambda_grad, opts)
+        
         end_time = time.time()
 
         print(f"Time taken: {end_time-start_time} seconds")
         print(kernel.shape)
+        #Crop kernel to be 19 x 19
+        kernel = kernel[6:25,6:25]
         from skimage.metrics import structural_similarity as s_sim
+        f.write(str(s_sim(gt_kernel.numpy(),kernel.numpy() ,data_range=1.0)) + '\n')
         print(s_sim(gt_kernel.numpy(),kernel.numpy() ,data_range=1.0))
         
         # plt.figure(figsize=(12, 6))
@@ -165,6 +173,6 @@ def main():
     # kernel_image.save(os.path.join(results_dir, 'kernel.png'))
     # latent_image.save(os.path.join(results_dir, 'result.png'))
     # interim_image.save(os.path.join(results_dir, 'interim_result.png'))
-
+    f.close()
 if __name__ == "__main__":
     main()
