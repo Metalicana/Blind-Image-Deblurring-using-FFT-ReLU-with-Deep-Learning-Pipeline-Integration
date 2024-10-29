@@ -1,3 +1,6 @@
+## Update
+We are officially accepted to "IEEE/CVF Winter Conference on Applications of Computer Vision" (WACV2025) 🔥🔥
+
 ## The First PyTorch implementation of popular blind image deblurring papers
 We present this PyTorch implementation, shifting from MATLAB for more reachability to researchers. There are scopes to optimize speed, and integrate this into deep learning frameworks! We also have included our own prior into the blind image deblurring framework.
 
